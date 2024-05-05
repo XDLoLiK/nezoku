@@ -11,8 +11,7 @@ namespace nezoku {
 
 class SelectionStatement: public Statement {
 public:
-    SelectionStatement(Expression* if_expression, Statement* then_statement);
-    SelectionStatement(Expression* if_expression, Statement* then_statement, Statement* else_statement);
+    SelectionStatement(Expression* if_expression, Statement* then_statement, Statement* else_statement = nullptr);
     ~SelectionStatement() final;
 
     void accept_visitor(Visitor* visitor) final;

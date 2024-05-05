@@ -48,9 +48,10 @@
 	#include "ast/break_statement.hpp"
 	#include "ast/continue_statement.hpp"
 	#include "ast/selection_statement.hpp"
-	#include "ast/comma_expression.hpp"
+	#include "ast/iteration_statement.hpp"
 	
 	#include "ast/expression.hpp"
+	#include "ast/comma_expression.hpp"
 	#include "ast/assignment_expression.hpp"
 	#include "ast/logical_or_expression.hpp"
 	#include "ast/logical_and_expression.hpp"
@@ -276,11 +277,12 @@ selection_statement
 
 iteration_statement
     : WHILE_KW '(' expression ')' statement {
-		$$ = new nezoku::IterationStatement();
-		$$->add_condition($3);
-		$$->add_statement($5);
+		auto iteration_statement = new nezoku::IterationStatement();
+		iteration_statement->add_condition($3);
+		iteration_statement->add_statement($5);
+		$$ = iteration_statement;
 	};
-    | FOR_KW '(' expression_statement expression_statement ')' statement {
+    /* | FOR_KW '(' expression_statement expression_statement ')' statement {
 		$$ = new nezoku::IterationStatement();
 		$$->add_initialization($3);
 		$$->add_condition($4);
@@ -305,7 +307,7 @@ iteration_statement
 		$$->add_condition($4);
 		$$->add_updation($5);
 		$$->add_statement($7);
-	};
+	}; */
     ;
 
 jump_statement
@@ -328,7 +330,7 @@ expression
 assignment_expression
 	: logical_or_expression { $$ = $1; };
 	| primary_expression assignment_operator assignment_expression {
-		$$ = new nezoku::AssignementExpression($1, $2, $3);
+		$$ = new nezoku::AssignmentExpression($1, $2, $3);
 	};
 	;
 

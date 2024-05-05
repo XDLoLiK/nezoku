@@ -12,7 +12,7 @@ namespace nezoku {
 
 class Declaration: public Accepter {
 public:
-    Declaration(TypeSpecifier type, std::string id, Expression* initializer);
+    Declaration(TypeSpecifier type, std::string id, Expression* initializer = nullptr);
     ~Declaration() final;
   
     void accept_visitor(Visitor* visitor) final;

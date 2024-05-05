@@ -3,12 +3,7 @@
 
 namespace nezoku {
 
-SelectionStatement::SelectionStatement(Expression* if_expression, Statement* then_statement)
-    : if_expression_(if_expression)
-    , then_statement_(then_statement) {}
-
-SelectionStatement::SelectionStatement(Expression* if_expression, Statement* then_statement,
-                                       Statement* else_statement)
+SelectionStatement::SelectionStatement(Expression* if_expression, Statement* then_statement, Statement* else_statement)
     : if_expression_(if_expression)
     , then_statement_(then_statement)
     , else_statement_(else_statement) {}
