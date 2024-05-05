@@ -1,4 +1,5 @@
 #include "declaration.hpp"
+#include "expression.hpp"
 #include "visitors/visitor.hpp"
 
 namespace nezoku {

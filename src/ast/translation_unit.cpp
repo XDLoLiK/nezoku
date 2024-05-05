@@ -1,4 +1,6 @@
 #include "translation_unit.hpp"
+#include "expression.hpp"
+#include "statement.hpp"
 #include "visitors/visitor.hpp"
 
 namespace nezoku {

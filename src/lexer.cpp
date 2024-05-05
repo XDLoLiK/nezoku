@@ -624,12 +624,12 @@ static const flex_int16_t yy_chk[426] =
 
 static const flex_int16_t yy_rule_linenum[52] =
     {   0,
-       47,   48,   69,   70,   71,   72,   73,   74,   75,   76,
-       77,   78,   79,   80,   81,   82,   83,   84,   85,   86,
-       87,   89,   90,   91,   92,   93,   94,   95,   96,   97,
-       98,   99,  100,  101,  102,  103,  104,  105,  106,  108,
-      109,  110,  111,  112,  113,  114,  115,  116,  118,  119,
-      123
+       46,   47,   68,   69,   70,   71,   72,   73,   74,   75,
+       76,   77,   78,   79,   80,   81,   82,   83,   84,   85,
+       86,   88,   89,   90,   91,   92,   93,   94,   95,   96,
+       97,   98,   99,  100,  101,  102,  103,  104,  105,  107,
+      108,  109,  110,  111,  112,  113,  114,  115,  117,  118,
+      122
     } ;
 
 /* The intent behind this definition is that it'll catch
@@ -647,15 +647,14 @@ static const flex_int16_t yy_rule_linenum[52] =
     #include <string>
 
     #include "driver.hpp"
-    #include "scanner.hpp"
     #include "parser.hpp"
-#line 652 "/home/stanislav/Mipt/compilers-course/nezoku/src/lexer.cpp"
+#line 651 "/home/stanislav/Mipt/compilers-course/nezoku/src/lexer.cpp"
 #define YY_NO_INPUT 1
-#line 34 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 33 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
     // Code run every time a pattern is matched.
     #define YY_USER_ACTION  loc.columns(yyleng);
+#line 656 "/home/stanislav/Mipt/compilers-course/nezoku/src/lexer.cpp"
 #line 657 "/home/stanislav/Mipt/compilers-course/nezoku/src/lexer.cpp"
-#line 658 "/home/stanislav/Mipt/compilers-course/nezoku/src/lexer.cpp"
 
 #define INITIAL 0
 
@@ -847,17 +846,17 @@ YY_DECL
 
 	{
 /* %% [7.0] user's declarations go here */
-#line 38 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 37 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 
 
 
-#line 42 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 41 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
     // Code run every time yylex is invoked.
     yy::location& loc = driver.location;
     loc.step();
 
 
-#line 860 "/home/stanislav/Mipt/compilers-course/nezoku/src/lexer.cpp"
+#line 859 "/home/stanislav/Mipt/compilers-course/nezoku/src/lexer.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -934,12 +933,12 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 47 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 46 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { /* consume // comment */ }
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 48 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 47 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 {
                             int symbol = 0;
 
@@ -963,244 +962,244 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 69 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 68 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_BREAK_KW(loc); }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 70 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 69 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_CHAR_T(loc); }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 71 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 70 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_CONTINUE_KW(loc); }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 72 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 71 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_ELSE_KW(loc); }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 73 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 72 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_FOR_KW(loc); }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 74 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 73 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_BOOL_T(loc); }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 75 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 74 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_FLOAT_32_T(loc); }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 76 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 75 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_FLOAT_64_T(loc); }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 77 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 76 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_IF_KW(loc); }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 78 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 77 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_INT_8_T(loc); }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 79 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 78 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_UINT_8_T(loc); }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 80 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 79 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_INT_16_T(loc); }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 81 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 80 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_UINT_16_T(loc); }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 82 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 81 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_INT_32_T(loc); }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 83 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 82 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_UINT_32_T(loc); }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 84 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 83 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_INT_64_T(loc); }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 85 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 84 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_UINT_64_T(loc); }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 86 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 85 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_RETURN_KW(loc); }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 87 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 86 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_WHILE_KW(loc); }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 89 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 88 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_SHR_ASSIGN(loc); }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 90 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 89 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_SHL_ASSIGN(loc); }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 91 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 90 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_ADD_ASSIGN(loc); }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 92 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 91 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_SUB_ASSIGN(loc); }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 93 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 92 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_MUL_ASSIGN(loc); }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 94 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 93 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_DIV_ASSIGN(loc); }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 95 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 94 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_MOD_ASSIGN(loc); }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 96 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 95 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_AND_ASSIGN(loc); }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 97 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 96 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_XOR_ASSIGN(loc); }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 98 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 97 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_OR_ASSIGN(loc); }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 99 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 98 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_SHR_OP(loc); }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 100 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 99 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_SHL_OP(loc); }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 101 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 100 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_LAND_OP(loc); }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 102 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 101 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_LOR_OP(loc); }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 103 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 102 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_LEQ_OP(loc); }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 104 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 103 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_GEQ_OP(loc); }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 105 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 104 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_EQ_OP(loc); }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 106 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 105 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_NEQ_OP(loc); }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 108 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 107 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_IDENTIFIER(yytext, loc); }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 109 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 108 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_CONSTANT(yytext, loc); }    
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 110 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 109 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_CONSTANT(yytext, loc); }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 111 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 110 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_CONSTANT(yytext, loc); }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 112 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 111 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_CONSTANT(yytext, loc); }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 113 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 112 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_CONSTANT(yytext, loc); }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 114 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 113 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_CONSTANT(yytext, loc); }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 115 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 114 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_CONSTANT(yytext, loc); }
 	YY_BREAK
 case 48:
 /* rule 48 can match eol */
 YY_RULE_SETUP
-#line 116 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 115 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_STRING_LITERAL(yytext, loc); }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 118 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 117 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { loc.step(); }
 	YY_BREAK
 case 50:
 /* rule 50 can match eol */
 YY_RULE_SETUP
-#line 119 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 118 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 {
                 loc.lines(yyleng);
                 loc.step();
@@ -1208,19 +1207,19 @@ YY_RULE_SETUP
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 123 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 122 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { throw yy::parser::syntax_error(loc, "unknown symbol: " + std::string(yytext)); }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 124 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 123 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 { return yy::parser::make_END(loc); }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 126 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 125 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 ECHO;
 	YY_BREAK
-#line 1223 "/home/stanislav/Mipt/compilers-course/nezoku/src/lexer.cpp"
+#line 1222 "/home/stanislav/Mipt/compilers-course/nezoku/src/lexer.cpp"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2337,6 +2336,6 @@ void yyfree (void * ptr )
 
 /* %ok-for-header */
 
-#line 126 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
+#line 125 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
 
 

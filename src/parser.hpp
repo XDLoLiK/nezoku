@@ -530,46 +530,47 @@ namespace yy {
     YYEOF = 0,                     // "end of file"
     YYerror = 256,                 // error
     YYUNDEF = 257,                 // "invalid token"
-    RETURN_KW = 258,               // RETURN_KW
-    IF_KW = 259,                   // IF_KW
-    ELSE_KW = 260,                 // ELSE_KW
-    FOR_KW = 261,                  // FOR_KW
-    CONTINUE_KW = 262,             // CONTINUE_KW
-    BREAK_KW = 263,                // BREAK_KW
-    WHILE_KW = 264,                // WHILE_KW
-    IDENTIFIER = 265,              // "identifier"
-    CONSTANT = 266,                // "constant"
-    STRING_LITERAL = 267,          // "string"
-    MUL_ASSIGN = 268,              // MUL_ASSIGN
-    DIV_ASSIGN = 269,              // DIV_ASSIGN
-    MOD_ASSIGN = 270,              // MOD_ASSIGN
-    ADD_ASSIGN = 271,              // ADD_ASSIGN
-    SUB_ASSIGN = 272,              // SUB_ASSIGN
-    SHL_ASSIGN = 273,              // SHL_ASSIGN
-    SHR_ASSIGN = 274,              // SHR_ASSIGN
-    AND_ASSIGN = 275,              // AND_ASSIGN
-    XOR_ASSIGN = 276,              // XOR_ASSIGN
-    OR_ASSIGN = 277,               // OR_ASSIGN
-    LAND_OP = 278,                 // LAND_OP
-    LOR_OP = 279,                  // LOR_OP
-    NEQ_OP = 280,                  // NEQ_OP
-    EQ_OP = 281,                   // EQ_OP
-    GEQ_OP = 282,                  // GEQ_OP
-    LEQ_OP = 283,                  // LEQ_OP
-    SHL_OP = 284,                  // SHL_OP
-    SHR_OP = 285,                  // SHR_OP
-    BOOL_T = 286,                  // BOOL_T
-    CHAR_T = 287,                  // CHAR_T
-    FLOAT_32_T = 288,              // FLOAT_32_T
-    FLOAT_64_T = 289,              // FLOAT_64_T
-    INT_8_T = 290,                 // INT_8_T
-    UINT_8_T = 291,                // UINT_8_T
-    INT_16_T = 292,                // INT_16_T
-    UINT_16_T = 293,               // UINT_16_T
-    INT_32_T = 294,                // INT_32_T
-    UINT_32_T = 295,               // UINT_32_T
-    INT_64_T = 296,                // INT_64_T
-    UINT_64_T = 297                // UINT_64_T
+    END = 258,                     // END
+    RETURN_KW = 259,               // RETURN_KW
+    IF_KW = 260,                   // IF_KW
+    ELSE_KW = 261,                 // ELSE_KW
+    FOR_KW = 262,                  // FOR_KW
+    CONTINUE_KW = 263,             // CONTINUE_KW
+    BREAK_KW = 264,                // BREAK_KW
+    WHILE_KW = 265,                // WHILE_KW
+    IDENTIFIER = 266,              // "identifier"
+    CONSTANT = 267,                // "constant"
+    STRING_LITERAL = 268,          // "string"
+    MUL_ASSIGN = 269,              // MUL_ASSIGN
+    DIV_ASSIGN = 270,              // DIV_ASSIGN
+    MOD_ASSIGN = 271,              // MOD_ASSIGN
+    ADD_ASSIGN = 272,              // ADD_ASSIGN
+    SUB_ASSIGN = 273,              // SUB_ASSIGN
+    SHL_ASSIGN = 274,              // SHL_ASSIGN
+    SHR_ASSIGN = 275,              // SHR_ASSIGN
+    AND_ASSIGN = 276,              // AND_ASSIGN
+    XOR_ASSIGN = 277,              // XOR_ASSIGN
+    OR_ASSIGN = 278,               // OR_ASSIGN
+    LAND_OP = 279,                 // LAND_OP
+    LOR_OP = 280,                  // LOR_OP
+    NEQ_OP = 281,                  // NEQ_OP
+    EQ_OP = 282,                   // EQ_OP
+    GEQ_OP = 283,                  // GEQ_OP
+    LEQ_OP = 284,                  // LEQ_OP
+    SHL_OP = 285,                  // SHL_OP
+    SHR_OP = 286,                  // SHR_OP
+    BOOL_T = 287,                  // BOOL_T
+    CHAR_T = 288,                  // CHAR_T
+    FLOAT_32_T = 289,              // FLOAT_32_T
+    FLOAT_64_T = 290,              // FLOAT_64_T
+    INT_8_T = 291,                 // INT_8_T
+    UINT_8_T = 292,                // UINT_8_T
+    INT_16_T = 293,                // INT_16_T
+    UINT_16_T = 294,               // UINT_16_T
+    INT_32_T = 295,                // INT_32_T
+    UINT_32_T = 296,               // UINT_32_T
+    INT_64_T = 297,                // INT_64_T
+    UINT_64_T = 298                // UINT_64_T
       };
       /// Backward compatibility alias (Bison 3.6).
       typedef token_kind_type yytokentype;
@@ -586,98 +587,99 @@ namespace yy {
     {
       enum symbol_kind_type
       {
-        YYNTOKENS = 61, ///< Number of tokens.
+        YYNTOKENS = 62, ///< Number of tokens.
         S_YYEMPTY = -2,
         S_YYEOF = 0,                             // "end of file"
         S_YYerror = 1,                           // error
         S_YYUNDEF = 2,                           // "invalid token"
-        S_RETURN_KW = 3,                         // RETURN_KW
-        S_IF_KW = 4,                             // IF_KW
-        S_ELSE_KW = 5,                           // ELSE_KW
-        S_FOR_KW = 6,                            // FOR_KW
-        S_CONTINUE_KW = 7,                       // CONTINUE_KW
-        S_BREAK_KW = 8,                          // BREAK_KW
-        S_WHILE_KW = 9,                          // WHILE_KW
-        S_IDENTIFIER = 10,                       // "identifier"
-        S_CONSTANT = 11,                         // "constant"
-        S_STRING_LITERAL = 12,                   // "string"
-        S_MUL_ASSIGN = 13,                       // MUL_ASSIGN
-        S_DIV_ASSIGN = 14,                       // DIV_ASSIGN
-        S_MOD_ASSIGN = 15,                       // MOD_ASSIGN
-        S_ADD_ASSIGN = 16,                       // ADD_ASSIGN
-        S_SUB_ASSIGN = 17,                       // SUB_ASSIGN
-        S_SHL_ASSIGN = 18,                       // SHL_ASSIGN
-        S_SHR_ASSIGN = 19,                       // SHR_ASSIGN
-        S_AND_ASSIGN = 20,                       // AND_ASSIGN
-        S_XOR_ASSIGN = 21,                       // XOR_ASSIGN
-        S_OR_ASSIGN = 22,                        // OR_ASSIGN
-        S_LAND_OP = 23,                          // LAND_OP
-        S_LOR_OP = 24,                           // LOR_OP
-        S_NEQ_OP = 25,                           // NEQ_OP
-        S_EQ_OP = 26,                            // EQ_OP
-        S_GEQ_OP = 27,                           // GEQ_OP
-        S_LEQ_OP = 28,                           // LEQ_OP
-        S_SHL_OP = 29,                           // SHL_OP
-        S_SHR_OP = 30,                           // SHR_OP
-        S_BOOL_T = 31,                           // BOOL_T
-        S_CHAR_T = 32,                           // CHAR_T
-        S_FLOAT_32_T = 33,                       // FLOAT_32_T
-        S_FLOAT_64_T = 34,                       // FLOAT_64_T
-        S_INT_8_T = 35,                          // INT_8_T
-        S_UINT_8_T = 36,                         // UINT_8_T
-        S_INT_16_T = 37,                         // INT_16_T
-        S_UINT_16_T = 38,                        // UINT_16_T
-        S_INT_32_T = 39,                         // INT_32_T
-        S_UINT_32_T = 40,                        // UINT_32_T
-        S_INT_64_T = 41,                         // INT_64_T
-        S_UINT_64_T = 42,                        // UINT_64_T
-        S_43_ = 43,                              // '='
-        S_44_ = 44,                              // '|'
-        S_45_ = 45,                              // '^'
-        S_46_ = 46,                              // '&'
-        S_47_ = 47,                              // '<'
-        S_48_ = 48,                              // '>'
-        S_49_ = 49,                              // '+'
-        S_50_ = 50,                              // '-'
-        S_51_ = 51,                              // '*'
-        S_52_ = 52,                              // '/'
-        S_53_ = 53,                              // '%'
-        S_54_then_ = 54,                         // "then"
-        S_55_ = 55,                              // ';'
-        S_56_ = 56,                              // '('
-        S_57_ = 57,                              // ')'
-        S_58_ = 58,                              // ','
-        S_59_ = 59,                              // '{'
-        S_60_ = 60,                              // '}'
-        S_YYACCEPT = 61,                         // $accept
-        S_translation_unit = 62,                 // translation_unit
-        S_external_declaration = 63,             // external_declaration
-        S_declaration = 64,                      // declaration
-        S_type_specifier = 65,                   // type_specifier
-        S_function_definition = 66,              // function_definition
-        S_parameter_list = 67,                   // parameter_list
-        S_compound_statement = 68,               // compound_statement
-        S_block_item_list = 69,                  // block_item_list
-        S_block_item = 70,                       // block_item
-        S_statement = 71,                        // statement
-        S_selection_statement = 72,              // selection_statement
-        S_iteration_statement = 73,              // iteration_statement
-        S_jump_statement = 74,                   // jump_statement
-        S_expression_statement = 75,             // expression_statement
-        S_expression = 76,                       // expression
-        S_assignment_expression = 77,            // assignment_expression
-        S_assignment_operator = 78,              // assignment_operator
-        S_logical_or_expression = 79,            // logical_or_expression
-        S_logical_and_expression = 80,           // logical_and_expression
-        S_inclusive_or_expression = 81,          // inclusive_or_expression
-        S_exclusive_or_expression = 82,          // exclusive_or_expression
-        S_and_expression = 83,                   // and_expression
-        S_equality_expression = 84,              // equality_expression
-        S_relational_expression = 85,            // relational_expression
-        S_shift_expression = 86,                 // shift_expression
-        S_additive_expression = 87,              // additive_expression
-        S_multiplicative_expression = 88,        // multiplicative_expression
-        S_primary_expression = 89                // primary_expression
+        S_END = 3,                               // END
+        S_RETURN_KW = 4,                         // RETURN_KW
+        S_IF_KW = 5,                             // IF_KW
+        S_ELSE_KW = 6,                           // ELSE_KW
+        S_FOR_KW = 7,                            // FOR_KW
+        S_CONTINUE_KW = 8,                       // CONTINUE_KW
+        S_BREAK_KW = 9,                          // BREAK_KW
+        S_WHILE_KW = 10,                         // WHILE_KW
+        S_IDENTIFIER = 11,                       // "identifier"
+        S_CONSTANT = 12,                         // "constant"
+        S_STRING_LITERAL = 13,                   // "string"
+        S_MUL_ASSIGN = 14,                       // MUL_ASSIGN
+        S_DIV_ASSIGN = 15,                       // DIV_ASSIGN
+        S_MOD_ASSIGN = 16,                       // MOD_ASSIGN
+        S_ADD_ASSIGN = 17,                       // ADD_ASSIGN
+        S_SUB_ASSIGN = 18,                       // SUB_ASSIGN
+        S_SHL_ASSIGN = 19,                       // SHL_ASSIGN
+        S_SHR_ASSIGN = 20,                       // SHR_ASSIGN
+        S_AND_ASSIGN = 21,                       // AND_ASSIGN
+        S_XOR_ASSIGN = 22,                       // XOR_ASSIGN
+        S_OR_ASSIGN = 23,                        // OR_ASSIGN
+        S_LAND_OP = 24,                          // LAND_OP
+        S_LOR_OP = 25,                           // LOR_OP
+        S_NEQ_OP = 26,                           // NEQ_OP
+        S_EQ_OP = 27,                            // EQ_OP
+        S_GEQ_OP = 28,                           // GEQ_OP
+        S_LEQ_OP = 29,                           // LEQ_OP
+        S_SHL_OP = 30,                           // SHL_OP
+        S_SHR_OP = 31,                           // SHR_OP
+        S_BOOL_T = 32,                           // BOOL_T
+        S_CHAR_T = 33,                           // CHAR_T
+        S_FLOAT_32_T = 34,                       // FLOAT_32_T
+        S_FLOAT_64_T = 35,                       // FLOAT_64_T
+        S_INT_8_T = 36,                          // INT_8_T
+        S_UINT_8_T = 37,                         // UINT_8_T
+        S_INT_16_T = 38,                         // INT_16_T
+        S_UINT_16_T = 39,                        // UINT_16_T
+        S_INT_32_T = 40,                         // INT_32_T
+        S_UINT_32_T = 41,                        // UINT_32_T
+        S_INT_64_T = 42,                         // INT_64_T
+        S_UINT_64_T = 43,                        // UINT_64_T
+        S_44_ = 44,                              // '='
+        S_45_ = 45,                              // '|'
+        S_46_ = 46,                              // '^'
+        S_47_ = 47,                              // '&'
+        S_48_ = 48,                              // '<'
+        S_49_ = 49,                              // '>'
+        S_50_ = 50,                              // '+'
+        S_51_ = 51,                              // '-'
+        S_52_ = 52,                              // '*'
+        S_53_ = 53,                              // '/'
+        S_54_ = 54,                              // '%'
+        S_55_then_ = 55,                         // "then"
+        S_56_ = 56,                              // ';'
+        S_57_ = 57,                              // '('
+        S_58_ = 58,                              // ')'
+        S_59_ = 59,                              // ','
+        S_60_ = 60,                              // '{'
+        S_61_ = 61,                              // '}'
+        S_YYACCEPT = 62,                         // $accept
+        S_translation_unit = 63,                 // translation_unit
+        S_external_declaration = 64,             // external_declaration
+        S_declaration = 65,                      // declaration
+        S_type_specifier = 66,                   // type_specifier
+        S_function_definition = 67,              // function_definition
+        S_parameter_list = 68,                   // parameter_list
+        S_compound_statement = 69,               // compound_statement
+        S_block_item_list = 70,                  // block_item_list
+        S_block_item = 71,                       // block_item
+        S_statement = 72,                        // statement
+        S_selection_statement = 73,              // selection_statement
+        S_iteration_statement = 74,              // iteration_statement
+        S_jump_statement = 75,                   // jump_statement
+        S_expression_statement = 76,             // expression_statement
+        S_expression = 77,                       // expression
+        S_assignment_expression = 78,            // assignment_expression
+        S_assignment_operator = 79,              // assignment_operator
+        S_logical_or_expression = 80,            // logical_or_expression
+        S_logical_and_expression = 81,           // logical_and_expression
+        S_inclusive_or_expression = 82,          // inclusive_or_expression
+        S_exclusive_or_expression = 83,          // exclusive_or_expression
+        S_and_expression = 84,                   // and_expression
+        S_equality_expression = 85,              // equality_expression
+        S_relational_expression = 86,            // relational_expression
+        S_shift_expression = 87,                 // shift_expression
+        S_additive_expression = 88,              // additive_expression
+        S_multiplicative_expression = 89,        // multiplicative_expression
+        S_primary_expression = 90                // primary_expression
       };
     };
 
@@ -1174,7 +1176,7 @@ switch (yykind)
                    || tok == 42
                    || tok == 47
                    || tok == 37
-                   || tok == 298
+                   || tok == 299
                    || tok == 59
                    || (40 <= tok && tok <= 41)
                    || tok == 44
@@ -1285,6 +1287,21 @@ switch (yykind)
       make_YYUNDEF (const location_type& l)
       {
         return symbol_type (token::YYUNDEF, l);
+      }
+#endif
+#if 201103L <= YY_CPLUSPLUS
+      static
+      symbol_type
+      make_END (location_type l)
+      {
+        return symbol_type (token::END, std::move (l));
+      }
+#else
+      static
+      symbol_type
+      make_END (const location_type& l)
+      {
+        return symbol_type (token::END, l);
       }
 #endif
 #if 201103L <= YY_CPLUSPLUS
@@ -2217,7 +2234,7 @@ switch (yykind)
     /// Constants.
     enum
     {
-      yylast_ = 213,     ///< Last index in yytable_.
+      yylast_ = 214,     ///< Last index in yytable_.
       yynnts_ = 29,  ///< Number of nonterminal symbols.
       yyfinal_ = 18 ///< Termination state number.
     };
@@ -2242,16 +2259,16 @@ switch (yykind)
        0,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,    53,    46,     2,
-      56,    57,    51,    49,    58,    50,     2,    52,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,    55,
-      47,    43,    48,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,    54,    47,     2,
+      57,    58,    52,    50,    59,    51,     2,    53,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,    56,
+      48,    44,    49,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,    45,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,    46,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,    59,    44,    60,     2,     2,     2,     2,
+       2,     2,     2,    60,    45,    61,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -2268,10 +2285,10 @@ switch (yykind)
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
       25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
-      35,    36,    37,    38,    39,    40,    41,    42,    54
+      35,    36,    37,    38,    39,    40,    41,    42,    43,    55
     };
     // Last valid token kind.
-    const int code_max = 298;
+    const int code_max = 299;
 
     if (t <= 0)
       return symbol_kind::S_YYEOF;
@@ -2521,7 +2538,7 @@ switch (yykind)
 
 
 } // yy
-#line 2525 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.hpp"
+#line 2542 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.hpp"
 
 
 

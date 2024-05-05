@@ -1,4 +1,6 @@
 #include "compound_statement.hpp"
+#include "declaration.hpp"
+#include "statement.hpp"
 #include "visitors/visitor.hpp"
 
 namespace nezoku {

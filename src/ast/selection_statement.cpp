@@ -1,4 +1,6 @@
 #include "selection_statement.hpp"
+#include "expression.hpp"
+#include "statement.hpp"
 #include "visitors/visitor.hpp"
 
 namespace nezoku {

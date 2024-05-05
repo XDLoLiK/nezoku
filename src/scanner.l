@@ -5,7 +5,6 @@
     #include <string>
 
     #include "driver.hpp"
-    #include "scanner.hpp"
     #include "parser.hpp"
 %}
 

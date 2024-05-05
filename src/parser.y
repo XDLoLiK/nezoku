@@ -29,9 +29,6 @@
 	}; // namespace nezoku
 }
 
-%param { nezoku::Driver& driver }
-%param { nezoku::Scanner& scanner }
-
 %code top {
     #include "location.hh"
     #include "stack.hh"
@@ -73,8 +70,18 @@
 	#include "ast/mod_expression.hpp"
 
 	#include "driver.hpp"
-	#include "scanner.hpp"
+
+	static yy::parser::symbol_type yylex(nezoku::Driver& driver, nezoku::Scanner& scanner) {
+        return scanner.ScanToken();
+    }
 }
+
+%param { nezoku::Driver& driver }
+%param { nezoku::Scanner& scanner }
+
+/* Special */
+
+%token END
 
 /* Keywords */
 
@@ -282,7 +289,8 @@ iteration_statement
 		iteration_statement->add_statement($5);
 		$$ = iteration_statement;
 	};
-    /* | FOR_KW '(' expression_statement expression_statement ')' statement {
+    /*
+	| FOR_KW '(' expression_statement expression_statement ')' statement {
 		$$ = new nezoku::IterationStatement();
 		$$->add_initialization($3);
 		$$->add_condition($4);
@@ -307,7 +315,8 @@ iteration_statement
 		$$->add_condition($4);
 		$$->add_updation($5);
 		$$->add_statement($7);
-	}; */
+	};
+	*/
     ;
 
 jump_statement
@@ -415,6 +424,6 @@ primary_expression
 
 %%
 
-void yy::parser::error(const yy::parser::syntax_error& error) {
-    std::cerr << error.location << ": " << error.what() << std::endl;
+void yy::parser::error(const location_type& location, const std::string& message) {
+	std::cerr << location << ": " << message << std::endl;
 }
