@@ -4,10 +4,13 @@
     #include <iostream>
     #include <string>
 
-    #include "parser.tab.hh"
+    #include "driver.hpp"
+    #include "scanner.hpp"
+    #include "parser.hpp"
 %}
 
 %option c++
+%option yyclass="Scanner"
 %option noyywrap
 %option noinput
 %option nounput
@@ -21,13 +24,24 @@ HX [a-fA-F0-9]
 EP ([e][+-]?{DM}+)
 LT [a-zA-Z_]
 AP [a-zA-Z_0-9]
-WS [ \t\v\n\f]
+WS [ \t\v\f]
 FS ((_)?(f32|f64))
 IS ((_)?(u8|i8|u16|i16|u32|i32|u64|i64))
 HP (0[xX])
 ES (\\(['"\?\\abfnrtv]|x{HX}+))
 
+%{
+    // Code run every time a pattern is matched.
+    #define YY_USER_ACTION  loc.columns(yyleng);
+%}
+
 %%
+
+%{
+    // Code run every time yylex is invoked.
+    yy::location& loc = driver.location;
+    loc.step();
+%}
 
 "//".*                  { /* consume // comment */ }
 "/*"                    {
@@ -45,68 +59,67 @@ ES (\\(['"\?\\abfnrtv]|x{HX}+))
                                 }
 
                                 if (symbol == EOF) {
-                                    LexerError("Unterminated comment.");
+                                    throw yy::parser::syntax_error(loc, "unterminated comment: " + std::string(yytext));
                                     break;
                                 }
                             }
                         }
 
-"break"                 { return yy::parser::token::BREAK_KW; }
-"char"                  { return yy::parser::token::CHAR_T; }
-"const"                 { return yy::parser::token::CONST_KW; }
-"continue"              { return yy::parser::token::CONTINUE_KW; }
-"else"                  { return yy::parser::token::ELSE_KW; }
-"enum"                  { return yy::parser::token::ENUM_KW; }
-"for"                   { return yy::parser::token::FOR_KW; }
-"bool"                  { return yy::parser::token::BOOL_T; }
-"f32"                   { return yy::parser::token::FLOAT_32_T; }
-"f64"                   { return yy::parser::token::FLOAT_64_T; }
-"if"                    { return yy::parser::token::IF_KW; }
-"i8"                    { return yy::parser::token::INT_8_T; }
-"u8"                    { return yy::parser::token::UINT_8_T; }
-"i16"                   { return yy::parser::token::INT_16_T; }
-"u16"                   { return yy::parser::token::UINT_16_T; }
-"i32"                   { return yy::parser::token::INT_32_T; }
-"u32"                   { return yy::parser::token::UINT_32_T; }
-"i64"                   { return yy::parser::token::INT_64_T; }
-"u64"                   { return yy::parser::token::UINT_64_T; }
-"return"                { return yy::parser::token::RETURN_KW; }
-"sizeof"                { return yy::parser::token::SIZEOF_KW; }
-"while"                 { return yy::parser::token::WHILE_KW; }
+"break"                 { return yy::parser::make_BREAK_KW(loc); }
+"char"                  { return yy::parser::make_CHAR_T(loc); }
+"continue"              { return yy::parser::make_CONTINUE_KW(loc); }
+"else"                  { return yy::parser::make_ELSE_KW(loc); }
+"for"                   { return yy::parser::make_FOR_KW(loc); }
+"bool"                  { return yy::parser::make_BOOL_T(loc); }
+"f32"                   { return yy::parser::make_FLOAT_32_T(loc); }
+"f64"                   { return yy::parser::make_FLOAT_64_T(loc); }
+"if"                    { return yy::parser::make_IF_KW(loc); }
+"i8"                    { return yy::parser::make_INT_8_T(loc); }
+"u8"                    { return yy::parser::make_UINT_8_T(loc); }
+"i16"                   { return yy::parser::make_INT_16_T(loc); }
+"u16"                   { return yy::parser::make_UINT_16_T(loc); }
+"i32"                   { return yy::parser::make_INT_32_T(loc); }
+"u32"                   { return yy::parser::make_UINT_32_T(loc); }
+"i64"                   { return yy::parser::make_INT_64_T(loc); }
+"u64"                   { return yy::parser::make_UINT_64_T(loc); }
+"return"                { return yy::parser::make_RETURN_KW(loc); }
+"while"                 { return yy::parser::make_WHILE_KW(loc); }
 
-">>="                   { return yy::parser::token::SHR_ASSIGN; }
-"<<="                   { return yy::parser::token::SHL_ASSIGN; }
-"+="                    { return yy::parser::token::ADD_ASSIGN; }
-"-="                    { return yy::parser::token::SUB_ASSIGN; }
-"*="                    { return yy::parser::token::MUL_ASSIGN; }
-"/="                    { return yy::parser::token::DIV_ASSIGN; }
-"%="                    { return yy::parser::token::MOD_ASSIGN; }
-"&="                    { return yy::parser::token::AND_ASSIGN; }
-"^="                    { return yy::parser::token::XOR_ASSIGN; }
-"|="                    { return yy::parser::token::OR_ASSIGN; }
-">>"                    { return yy::parser::token::SHR_OP; }
-"<<"                    { return yy::parser::token::SHL_OP; }
-"++"                    { return yy::parser::token::INC_OP; }
-"--"                    { return yy::parser::token::DEC_OP; }
-"->"                    { return yy::parser::token::PTR_OP; }
-"&&"                    { return yy::parser::token::LAND_OP; }
-"||"                    { return yy::parser::token::LOR_OP; }
-"<="                    { return yy::parser::token::LEQ_OP; }
-">="                    { return yy::parser::token::GEQ_OP; }
-"=="                    { return yy::parser::token::EQ_OP; }
-"!="                    { return yy::parser::token::NEQ_OP; }
+">>="                   { return yy::parser::make_SHR_ASSIGN(loc); }
+"<<="                   { return yy::parser::make_SHL_ASSIGN(loc); }
+"+="                    { return yy::parser::make_ADD_ASSIGN(loc); }
+"-="                    { return yy::parser::make_SUB_ASSIGN(loc); }
+"*="                    { return yy::parser::make_MUL_ASSIGN(loc); }
+"/="                    { return yy::parser::make_DIV_ASSIGN(loc); }
+"%="                    { return yy::parser::make_MOD_ASSIGN(loc); }
+"&="                    { return yy::parser::make_AND_ASSIGN(loc); }
+"^="                    { return yy::parser::make_XOR_ASSIGN(loc); }
+"|="                    { return yy::parser::make_OR_ASSIGN(loc); }
+">>"                    { return yy::parser::make_SHR_OP(loc); }
+"<<"                    { return yy::parser::make_SHL_OP(loc); }
+"&&"                    { return yy::parser::make_LAND_OP(loc); }
+"||"                    { return yy::parser::make_LOR_OP(loc); }
+"<="                    { return yy::parser::make_LEQ_OP(loc); }
+">="                    { return yy::parser::make_GEQ_OP(loc); }
+"=="                    { return yy::parser::make_EQ_OP(loc); }
+"!="                    { return yy::parser::make_NEQ_OP(loc); }
 
-{LT}{AP}*                       { return yy::parser::token::IDENTIFIER; }
-{HP}{HX}+{IS}?                  { return yy::parser::token::CONSTANT; }    
-{NZ}{DM}*{IS}?                  { return yy::parser::token::CONSTANT; }
-"0"{OC}*{IS}?                   { return yy::parser::token::CONSTANT; }
-"'"([^'\\\n]|{ES})+"'"          { return yy::parser::token::CONSTANT; }
-{DM}+{EP}{FS}?				    { return yy::parser::token::CONSTANT; }
-{DM}*"."{DM}+{EP}?{FS}?         { return yy::parser::token::CONSTANT; }
-{DM}+"."{EP}?{FS}?			    { return yy::parser::token::CONSTANT; }
-(\"([^"\\\n]|{ES})*\"{WS}*)+    { return yy::parser::token::STRING_LITERAL; }
+{LT}{AP}*                           { return yy::parser::make_IDENTIFIER(yytext, loc); }
+{HP}{HX}+{IS}?                      { return yy::parser::make_CONSTANT(yytext, loc); }    
+{NZ}{DM}*{IS}?                      { return yy::parser::make_CONSTANT(yytext, loc); }
+"0"{OC}*{IS}?                       { return yy::parser::make_CONSTANT(yytext, loc); }
+"'"([^'\\\n]|{ES})+"'"              { return yy::parser::make_CONSTANT(yytext, loc); }
+{DM}+{EP}{FS}?				        { return yy::parser::make_CONSTANT(yytext, loc); }
+{DM}*"."{DM}+{EP}?{FS}?             { return yy::parser::make_CONSTANT(yytext, loc); }
+{DM}+"."{EP}?{FS}?			        { return yy::parser::make_CONSTANT(yytext, loc); }
+(\"([^"\\\n]|{ES})*\"({WS}|\n)*)+   { return yy::parser::make_STRING_LITERAL(yytext, loc); }
 
-{WS}+       { /* whitespace separates tokens */ }
-.			{ LexerError("Unknown symbol."); }
+{WS}+       { loc.step(); }
+\n+         {
+                loc.lines(yyleng);
+                loc.step();
+            }
+.			{ throw yy::parser::syntax_error(loc, "unknown symbol: " + std::string(yytext)); }
+<<EOF>>     { return yy::parser::make_END(loc); }
 
 %%
