@@ -68,6 +68,9 @@
 	#include "ast/mul_expression.hpp"
 	#include "ast/div_expression.hpp"
 	#include "ast/mod_expression.hpp"
+	#include "ast/identifier_expression.hpp"
+	#include "ast/constant_expression.hpp"
+	#include "ast/string_expression.hpp"
 
 	#include "driver.hpp"
 
@@ -320,10 +323,10 @@ iteration_statement
     ;
 
 jump_statement
-    : CONTINUE_KW ';' { $$ = nezoku::JumpStatement::create_continue(); };
-    | BREAK_KW ';' { $$ = nezoku::JumpStatement::create_break(); };
-    | RETURN_KW ';' { $$ = nezoku::JumpStatement::create_return(); };
-    | RETURN_KW expression ';' { $$ = nezoku::JumpStatement::create_return($2); };
+    : CONTINUE_KW ';' { $$ = new nezoku::ContinueStatement(); };
+    | BREAK_KW ';' { $$ = new nezoku::BreakStatement(); };
+    | RETURN_KW ';' { $$ = new nezoku::ReturnStatement(); };
+    | RETURN_KW expression ';' { $$ = new nezoku::ReturnStatement($2); };
     ;
 
 expression_statement

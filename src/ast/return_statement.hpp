@@ -2,14 +2,13 @@
 #define RETURN_STATEMENT_HPP
 
 #include "common.hpp"
-#include "jump_statement.hpp"
+#include "statement.hpp"
 
 namespace nezoku {
 
-class ReturnStatement: public JumpStatement {
+class ReturnStatement: public Statement {
 public:
-    ReturnStatement();
-    ReturnStatement(Expression* expression);
+    ReturnStatement(Expression* expression = nullptr);
     ~ReturnStatement();
 
     void accept_visitor(Visitor* visitor);

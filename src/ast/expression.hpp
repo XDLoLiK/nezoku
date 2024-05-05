@@ -8,7 +8,7 @@ namespace nezoku {
 
 class Expression: public Accepter {
 public:
-    virtual ~Expression() = 0;
+    virtual ~Expression() = default;
 
     virtual void accept_visitor(Visitor* visitor) = 0;
 };

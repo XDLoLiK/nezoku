@@ -2,11 +2,11 @@
 #define CONTINUE_STATEMENT_HPP
 
 #include "common.hpp"
-#include "jump_statement.hpp"
+#include "statement.hpp"
 
 namespace nezoku {
 
-class ContinueStatement: public JumpStatement {
+class ContinueStatement: public Statement {
 public:
     ~ContinueStatement();
 

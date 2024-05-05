@@ -7,7 +7,7 @@ namespace nezoku {
 
 class Visitor {
 public:
-    virtual ~Visitor() = 0;
+    virtual ~Visitor() = default;
 
     virtual void visit(TranslationUnit* translation_unit) = 0;
     virtual void visit(FunctionDefinition* function_definition) = 0;

@@ -1,11 +1,9 @@
 #include "iteration_statement.hpp"
 #include "expression.hpp"
-#include "statement.hpp
+#include "statement.hpp"
 #include "visitors/visitor.hpp"
 
 namespace nezoku {
-
-IterationStatement::IterationStatement() {}
 
 IterationStatement::~IterationStatement() {
     delete condition_;

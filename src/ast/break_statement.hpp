@@ -2,11 +2,11 @@
 #define BREAK_STATEMENT_HPP
 
 #include "common.hpp"
-#include "jump_statement.hpp"
+#include "statement.hpp"
 
 namespace nezoku {
 
-class BreakStatement: public JumpStatement {
+class BreakStatement: public Statement {
 public:
     ~BreakStatement();
 

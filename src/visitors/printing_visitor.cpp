@@ -11,6 +11,7 @@
 #include "ast/break_statement.hpp"
 #include "ast/continue_statement.hpp"
 #include "ast/selection_statement.hpp"
+#include "ast/iteration_statement.hpp"
 
 #include "ast/expression.hpp"
 #include "ast/comma_expression.hpp"
@@ -209,6 +210,10 @@ void PrintingVisitor::visit(SelectionStatement* selection_statement) {
     }
 
     tabs_--;
+}
+
+void PrintingVisitor::visit(IterationStatement* iteration_statement) {
+    // TODO: Implement.
 }
 
 void PrintingVisitor::visit(Expression* expression) {

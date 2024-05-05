@@ -12,6 +12,7 @@ list(
     ${CMAKE_CURRENT_SOURCE_DIR}/break_statement.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/continue_statement.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/selection_statement.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/iteration_statement.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/comma_expression.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/assignment_expression.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/logical_or_expression.cpp
@@ -32,6 +33,9 @@ list(
     ${CMAKE_CURRENT_SOURCE_DIR}/mul_expression.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/div_expression.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/mod_expression.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/identifier_expression.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/constant_expression.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/string_expression.cpp
 )
 
 set(SOURCES ${SOURCES} PARENT_SCOPE)

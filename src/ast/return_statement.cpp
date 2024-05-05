@@ -4,8 +4,6 @@
 
 namespace nezoku {
 
-ReturnStatement::ReturnStatement() {}
-
 ReturnStatement::ReturnStatement(Expression* expression)
     : expression_(expression) {}
 

@@ -7,7 +7,7 @@ namespace nezoku {
 
 class Accepter {
 public:
-    virtual ~Accepter() = 0;
+    virtual ~Accepter() = default;
 
     virtual void accept_visitor(Visitor* visitor) = 0;
 };
