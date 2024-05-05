@@ -9,9 +9,9 @@ namespace nezoku {
 class MulExpression: public Expression {
 public:
     MulExpression(Expression* left, Expression* right);
-    ~MulExpression() final;
+    ~MulExpression();
 
-    void accept_visitor(Visitor* visitor) final;
+    void accept_visitor(Visitor* visitor);
 
     [[nodiscard]]
     auto left_expression() const noexcept -> Expression*;

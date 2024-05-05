@@ -9,9 +9,9 @@ namespace nezoku {
 class AndExpression: public Expression {
 public:
     AndExpression(Expression* left, Expression* right);
-    ~AndExpression() final;
+    ~AndExpression();
 
-    void accept_visitor(Visitor* visitor) final;
+    void accept_visitor(Visitor* visitor);
 
     [[nodiscard]]
     auto left_expression() const noexcept -> Expression*;

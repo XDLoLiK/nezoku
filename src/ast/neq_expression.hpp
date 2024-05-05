@@ -9,9 +9,9 @@ namespace nezoku {
 class NeqExpression: public Expression {
 public:
     NeqExpression(Expression* left, Expression* right);
-    ~NeqExpression() final;
+    ~NeqExpression();
 
-    void accept_visitor(Visitor* visitor) final;
+    void accept_visitor(Visitor* visitor);
 
     [[nodiscard]]
     auto left_expression() const noexcept -> Expression*;

@@ -12,9 +12,9 @@ namespace nezoku {
 class SelectionStatement: public Statement {
 public:
     SelectionStatement(Expression* if_expression, Statement* then_statement, Statement* else_statement = nullptr);
-    ~SelectionStatement() final;
+    ~SelectionStatement();
 
-    void accept_visitor(Visitor* visitor) final;
+    void accept_visitor(Visitor* visitor);
 
     [[nodiscard]]
     auto if_expression() const noexcept -> Expression*;

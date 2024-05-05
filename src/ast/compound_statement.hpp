@@ -17,9 +17,9 @@ class CompoundStatement: public Statement {
 public:
     CompoundStatement();
     CompoundStatement(std::vector<BlockItem> block_item_list);
-    ~CompoundStatement() final;
+    ~CompoundStatement();
 
-    void accept_visitor(Visitor* visitor) final;
+    void accept_visitor(Visitor* visitor);
 
     [[nodiscard]]
     auto block_item_list() const noexcept -> const std::vector<BlockItem>&;

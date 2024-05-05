@@ -9,9 +9,9 @@ namespace nezoku {
 class ModExpression: public Expression {
 public:
     ModExpression(Expression* left, Expression* right);
-    ~ModExpression() final;
+    ~ModExpression();
 
-    void accept_visitor(Visitor* visitor) final;
+    void accept_visitor(Visitor* visitor);
 
     [[nodiscard]]
     auto left_expression() const noexcept -> Expression*;

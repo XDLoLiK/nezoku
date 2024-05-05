@@ -13,9 +13,9 @@ class TranslationUnit: public Accepter {
     using ExternalDeclaration = std::variant<Declaration*, FunctionDefinition*>;
 
 public:
-    ~TranslationUnit() final;
+    ~TranslationUnit();
 
-    void accept_visitor(Visitor* visitor) final;
+    void accept_visitor(Visitor* visitor);
 
     void add_external_declaration(ExternalDeclaration ext_decl);
 

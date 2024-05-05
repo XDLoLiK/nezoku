@@ -8,9 +8,9 @@ namespace nezoku {
 
 class ContinueStatement: public JumpStatement {
 public:
-    ~ContinueStatement() final;
+    ~ContinueStatement();
 
-    void accept_visitor(Visitor* visitor) final;
+    void accept_visitor(Visitor* visitor);
 };
 
 }; // namespace nezoku

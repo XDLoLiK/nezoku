@@ -9,9 +9,9 @@ namespace nezoku {
 class SubExpression: public Expression {
 public:
     SubExpression(Expression* left, Expression* right);
-    ~SubExpression() final;
+    ~SubExpression();
 
-    void accept_visitor(Visitor* visitor) final;
+    void accept_visitor(Visitor* visitor);
 
     [[nodiscard]]
     auto left_expression() const noexcept -> Expression*;

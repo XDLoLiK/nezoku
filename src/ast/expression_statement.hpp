@@ -9,9 +9,9 @@ namespace nezoku {
 class ExpressionStatement: public Statement {
 public:
     ExpressionStatement(Expression* expression = nullptr);
-    ~ExpressionStatement() final;
+    ~ExpressionStatement();
 
-    void accept_visitor(Visitor* visitor) final;
+    void accept_visitor(Visitor* visitor);
 
     [[nodiscard]]
     auto expression() const noexcept -> Expression*;

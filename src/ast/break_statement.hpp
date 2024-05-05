@@ -8,9 +8,9 @@ namespace nezoku {
 
 class BreakStatement: public JumpStatement {
 public:
-    ~BreakStatement() final;
+    ~BreakStatement();
 
-    void accept_visitor(Visitor* visitor) final;
+    void accept_visitor(Visitor* visitor);
 };
 
 }; // namespace nezoku

@@ -10,9 +10,9 @@ class ReturnStatement: public JumpStatement {
 public:
     ReturnStatement();
     ReturnStatement(Expression* expression);
-    ~ReturnStatement() final;
+    ~ReturnStatement();
 
-    void accept_visitor(Visitor* visitor) final;
+    void accept_visitor(Visitor* visitor);
 
     [[nodiscard]]
     auto expression() const noexcept -> Expression*;
