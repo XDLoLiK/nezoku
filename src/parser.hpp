@@ -462,9 +462,9 @@ namespace yy {
       // type_specifier
       char dummy7[sizeof (nezoku::TypeSpecifier)];
 
-      // "identifier"
-      // "constant"
-      // "string"
+      // IDENTIFIER
+      // CONSTANT
+      // STRING_LITERAL
       char dummy8[sizeof (std::string)];
 
       // external_declaration
@@ -538,9 +538,9 @@ namespace yy {
     CONTINUE_KW = 263,             // CONTINUE_KW
     BREAK_KW = 264,                // BREAK_KW
     WHILE_KW = 265,                // WHILE_KW
-    IDENTIFIER = 266,              // "identifier"
-    CONSTANT = 267,                // "constant"
-    STRING_LITERAL = 268,          // "string"
+    IDENTIFIER = 266,              // IDENTIFIER
+    CONSTANT = 267,                // CONSTANT
+    STRING_LITERAL = 268,          // STRING_LITERAL
     MUL_ASSIGN = 269,              // MUL_ASSIGN
     DIV_ASSIGN = 270,              // DIV_ASSIGN
     MOD_ASSIGN = 271,              // MOD_ASSIGN
@@ -600,9 +600,9 @@ namespace yy {
         S_CONTINUE_KW = 8,                       // CONTINUE_KW
         S_BREAK_KW = 9,                          // BREAK_KW
         S_WHILE_KW = 10,                         // WHILE_KW
-        S_IDENTIFIER = 11,                       // "identifier"
-        S_CONSTANT = 12,                         // "constant"
-        S_STRING_LITERAL = 13,                   // "string"
+        S_IDENTIFIER = 11,                       // IDENTIFIER
+        S_CONSTANT = 12,                         // CONSTANT
+        S_STRING_LITERAL = 13,                   // STRING_LITERAL
         S_MUL_ASSIGN = 14,                       // MUL_ASSIGN
         S_DIV_ASSIGN = 15,                       // DIV_ASSIGN
         S_MOD_ASSIGN = 16,                       // MOD_ASSIGN
@@ -761,9 +761,9 @@ namespace yy {
         value.move< nezoku::TypeSpecifier > (std::move (that.value));
         break;
 
-      case symbol_kind::S_IDENTIFIER: // "identifier"
-      case symbol_kind::S_CONSTANT: // "constant"
-      case symbol_kind::S_STRING_LITERAL: // "string"
+      case symbol_kind::S_IDENTIFIER: // IDENTIFIER
+      case symbol_kind::S_CONSTANT: // CONSTANT
+      case symbol_kind::S_STRING_LITERAL: // STRING_LITERAL
         value.move< std::string > (std::move (that.value));
         break;
 
@@ -1043,9 +1043,9 @@ switch (yykind)
         value.template destroy< nezoku::TypeSpecifier > ();
         break;
 
-      case symbol_kind::S_IDENTIFIER: // "identifier"
-      case symbol_kind::S_CONSTANT: // "constant"
-      case symbol_kind::S_STRING_LITERAL: // "string"
+      case symbol_kind::S_IDENTIFIER: // IDENTIFIER
+      case symbol_kind::S_CONSTANT: // CONSTANT
+      case symbol_kind::S_STRING_LITERAL: // STRING_LITERAL
         value.template destroy< std::string > ();
         break;
 
@@ -2352,9 +2352,9 @@ switch (yykind)
         value.copy< nezoku::TypeSpecifier > (YY_MOVE (that.value));
         break;
 
-      case symbol_kind::S_IDENTIFIER: // "identifier"
-      case symbol_kind::S_CONSTANT: // "constant"
-      case symbol_kind::S_STRING_LITERAL: // "string"
+      case symbol_kind::S_IDENTIFIER: // IDENTIFIER
+      case symbol_kind::S_CONSTANT: // CONSTANT
+      case symbol_kind::S_STRING_LITERAL: // STRING_LITERAL
         value.copy< std::string > (YY_MOVE (that.value));
         break;
 
@@ -2450,9 +2450,9 @@ switch (yykind)
         value.move< nezoku::TypeSpecifier > (YY_MOVE (s.value));
         break;
 
-      case symbol_kind::S_IDENTIFIER: // "identifier"
-      case symbol_kind::S_CONSTANT: // "constant"
-      case symbol_kind::S_STRING_LITERAL: // "string"
+      case symbol_kind::S_IDENTIFIER: // IDENTIFIER
+      case symbol_kind::S_CONSTANT: // CONSTANT
+      case symbol_kind::S_STRING_LITERAL: // STRING_LITERAL
         value.move< std::string > (YY_MOVE (s.value));
         break;
 

@@ -95,9 +95,9 @@
 
 /* Values & identifiers */
 
-%token <std::string> IDENTIFIER "identifier"
-%token <std::string> CONSTANT "constant"
-%token <std::string> STRING_LITERAL "string"
+%token <std::string> IDENTIFIER
+%token <std::string> CONSTANT
+%token <std::string> STRING_LITERAL
 
 /* Assignements */
 
@@ -211,8 +211,8 @@ external_declaration
     ;
 
 declaration
-    : type_specifier "identifier" ';' { $$ = new nezoku::Declaration($1, $2); };
-    | type_specifier "identifier" '=' expression ';' { $$ = new nezoku::Declaration($1, $2, $4); };
+    : type_specifier IDENTIFIER ';' { $$ = new nezoku::Declaration($1, $2); };
+    | type_specifier IDENTIFIER '=' expression ';' { $$ = new nezoku::Declaration($1, $2, $4); };
     ;
 
 type_specifier
@@ -231,18 +231,18 @@ type_specifier
     ;
 
 function_definition
-    : type_specifier "identifier" '(' parameter_list ')' statement {
+    : type_specifier IDENTIFIER '(' parameter_list ')' statement {
 		$$ = new nezoku::FunctionDefinition($1, $2, std::move($4), $6);
 	};
     ;
 
 parameter_list
     : %empty { $$ = std::vector<std::pair<nezoku::TypeSpecifier, std::string>>(); };
-    | type_specifier "identifier" {
+    | type_specifier IDENTIFIER {
 		$$ = std::vector<std::pair<nezoku::TypeSpecifier, std::string>>();
 		$$.push_back(std::make_pair($1, $2));
 	};
-    | parameter_list ',' type_specifier "identifier" {
+    | parameter_list ',' type_specifier IDENTIFIER {
 		$1.push_back(std::make_pair($3, $4));
 		$$ = $1;
 	};
@@ -416,9 +416,9 @@ multiplicative_expression
 	;
 
 primary_expression
-    : "identifier" { $$ = new nezoku::IdentifierExpression($1); };
-    | "constant" { $$ = new nezoku::ConstantExpression($1); };
-	| "string" { $$ = new nezoku::StringExpression($1); };
+    : IDENTIFIER { $$ = new nezoku::IdentifierExpression($1); };
+    | CONSTANT { $$ = new nezoku::ConstantExpression($1); };
+	| STRING_LITERAL { $$ = new nezoku::StringExpression($1); };
 	| '(' expression ')' { $$ = $2; };
     ;
 
