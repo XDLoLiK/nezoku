@@ -19,13 +19,14 @@ public:
     Driver();
     
     int parse(const std::string& file_name);
+    void print_tree(const std::string& filename);
 
     void scan_begin();
     void scan_end();
 
 public:
-    bool trace_scanning;
-    bool trace_parsing;
+    bool trace_scanning{false};
+    bool trace_parsing{false};
     int result;
 
     yy::location location;

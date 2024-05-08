@@ -38,6 +38,9 @@
 #include "ast/type_specifier.hpp"
 #include "ast/assignment_operator.hpp"
 
+#include <ostream>
+#include <iostream>
+
 namespace nezoku {
 
 template<class... Ts> struct VariantVisitor: Ts... { using Ts::operator()...; };
@@ -79,10 +82,12 @@ std::string assignment_operator_str(const AssignmentOperator& op) {
     }
 }
 
-PrintingVisitor::PrintingVisitor(std::ostream& stream)
-    : stream_(stream) {}
+PrintingVisitor::PrintingVisitor(const std::string& file)
+    : stream_(file) {}
 
-PrintingVisitor::~PrintingVisitor() {}
+PrintingVisitor::~PrintingVisitor() {
+    stream_.close();
+}
 
 void PrintingVisitor::visit(TranslationUnit* translation_unit) {
     for (const auto& external_declaration: translation_unit->external_declarations()) {
@@ -176,12 +181,12 @@ void PrintingVisitor::visit(ReturnStatement* return_statement) {
     tabs_--;
 }
 
-void PrintingVisitor::visit(ContinueStatement* continue_statement) {
+void PrintingVisitor::visit([[maybe_unused]] ContinueStatement* continue_statement) {
     print_tabs();
     stream_ << "continue" << std::endl;
 }
 
-void PrintingVisitor::visit(BreakStatement* break_statement) {
+void PrintingVisitor::visit([[maybe_unused]] BreakStatement* break_statement) {
     print_tabs();
     stream_ << "break" << std::endl;
 }
@@ -212,7 +217,7 @@ void PrintingVisitor::visit(SelectionStatement* selection_statement) {
     tabs_--;
 }
 
-void PrintingVisitor::visit(IterationStatement* iteration_statement) {
+void PrintingVisitor::visit([[maybe_unused]] IterationStatement* iteration_statement) {
     // TODO: Implement.
 }
 
@@ -316,7 +321,7 @@ void PrintingVisitor::visit_binary_op(T* op_expression, const std::string& op_st
     tabs_--;
 }
 
-void PrintingVisitor::print_tabs() const {
+void PrintingVisitor::print_tabs() {
     for (size_t i = 0; i < tabs_; i++) {
         stream_ << "\t";
     }

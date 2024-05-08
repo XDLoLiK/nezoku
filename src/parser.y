@@ -74,7 +74,7 @@
 
 	#include "driver.hpp"
 
-	static yy::parser::symbol_type yylex(nezoku::Driver& driver, nezoku::Scanner& scanner) {
+	static yy::parser::symbol_type yylex([[maybe_unused]] nezoku::Driver& driver, nezoku::Scanner& scanner) {
         return scanner.ScanToken();
     }
 }
@@ -201,6 +201,7 @@ translation_unit
     : external_declaration {
 		$$ = new nezoku::TranslationUnit();
 		$$->add_external_declaration(std::move($1));
+		driver.program = $$;
 	};
     | translation_unit external_declaration {
 		$1->add_external_declaration(std::move($2));

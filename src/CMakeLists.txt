@@ -30,6 +30,15 @@ add_executable(
     ${BISON_PARSER_OUTPUTS}
 )
 
+# target_compile_options(
+#     NEZOKU
+#     PRIVATE
+#     -Wall
+#     -Wextra
+#     -Wpedantic
+#     -Werror
+# )
+
 set_target_properties(
     NEZOKU
     PROPERTIES

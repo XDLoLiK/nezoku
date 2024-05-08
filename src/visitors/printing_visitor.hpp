@@ -1,8 +1,9 @@
 #ifndef PRINTING_VISITOR_HPP
 #define PRINTING_VISITOR_HPP
 
-#include <iostream>
+#include <fstream>
 #include <cassert>
+#include <string>
 
 #include "visitor.hpp"
 
@@ -10,7 +11,7 @@ namespace nezoku {
 
 class PrintingVisitor: public Visitor {
 public:
-    PrintingVisitor(std::ostream& stream);
+    PrintingVisitor(const std::string& file);
     ~PrintingVisitor();
 
     void visit(TranslationUnit* translation_unit);
@@ -48,14 +49,14 @@ public:
     void visit(ModExpression* mod_expression);
 
 private:
-    void print_tabs() const;
+    void print_tabs();
 
     template<class T>
     void visit_binary_op(T* op_expression, const std::string& op_string);
 
 private:
     size_t tabs_{0};
-    std::ostream& stream_;
+    std::ofstream stream_;
 };
 
 }; // namespace nezoku
