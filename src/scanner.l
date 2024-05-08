@@ -47,7 +47,7 @@ ES (\\(['"\?\\abfnrtv]|x{HX}+))
                             int symbol = 0;
 
                             while (true) {
-                                while ((symbol = yyinput()) != '*' && symbol != EOF ) { }
+                                while ((symbol = yyinput()) != '*' && symbol != EOF ) {}
 
                                 if (symbol == '*') {
                                     while ((symbol = yyinput()) == '*') {}
@@ -94,14 +94,32 @@ ES (\\(['"\?\\abfnrtv]|x{HX}+))
 "&="                    { return yy::parser::make_AND_ASSIGN(loc); }
 "^="                    { return yy::parser::make_XOR_ASSIGN(loc); }
 "|="                    { return yy::parser::make_OR_ASSIGN(loc); }
-">>"                    { return yy::parser::make_SHR_OP(loc); }
-"<<"                    { return yy::parser::make_SHL_OP(loc); }
-"&&"                    { return yy::parser::make_LAND_OP(loc); }
-"||"                    { return yy::parser::make_LOR_OP(loc); }
-"<="                    { return yy::parser::make_LEQ_OP(loc); }
-">="                    { return yy::parser::make_GEQ_OP(loc); }
-"=="                    { return yy::parser::make_EQ_OP(loc); }
-"!="                    { return yy::parser::make_NEQ_OP(loc); }
+">>"                    { return yy::parser::make_SHR(loc); }
+"<<"                    { return yy::parser::make_SHL(loc); }
+"&&"                    { return yy::parser::make_LAND(loc); }
+"||"                    { return yy::parser::make_LOR(loc); }
+"<="                    { return yy::parser::make_LEQ(loc); }
+">="                    { return yy::parser::make_GEQ(loc); }
+"=="                    { return yy::parser::make_EQ(loc); }
+"!="                    { return yy::parser::make_NEQ(loc); }
+
+"|"                    { return yy::parser::make_OR(loc); }
+"^"                    { return yy::parser::make_XOR(loc); }
+"&"                    { return yy::parser::make_AND(loc); }
+"<"                    { return yy::parser::make_LESS(loc); }
+">"                    { return yy::parser::make_GREATER(loc); }
+"+"                    { return yy::parser::make_ADD(loc); }
+"-"                    { return yy::parser::make_SUB(loc); }
+"*"                    { return yy::parser::make_MUL(loc); }
+"/"                    { return yy::parser::make_DIV(loc); }
+"%"                    { return yy::parser::make_MOD(loc); }
+";"                    { return yy::parser::make_SEMICOLON(loc); }
+"="                    { return yy::parser::make_ASSIGN(loc); }
+"("                    { return yy::parser::make_LPAREN(loc); }
+")"                    { return yy::parser::make_RPAREN(loc); }
+","                    { return yy::parser::make_COMA(loc); }
+"{"                    { return yy::parser::make_LBRACKET(loc); }
+"}"                    { return yy::parser::make_RBRACKET(loc); }
 
 {LT}{AP}*                           { return yy::parser::make_IDENTIFIER(yytext, loc); }
 {HP}{HX}+{IS}?                      { return yy::parser::make_CONSTANT(yytext, loc); }    

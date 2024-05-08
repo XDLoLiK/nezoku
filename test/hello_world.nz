@@ -1,0 +1,5 @@
+i32 main(u32 argc) {
+    "Hello, World!\n";
+    return 0;
+}
+

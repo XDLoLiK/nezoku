@@ -84,7 +84,7 @@
 
 /* Special */
 
-%token END
+%token END 0
 
 /* Keywords */
 
@@ -117,14 +117,14 @@
 
 /* Operators */
 
-%token LAND_OP
-%token LOR_OP
-%token NEQ_OP
-%token EQ_OP
-%token GEQ_OP
-%token LEQ_OP
-%token SHL_OP
-%token SHR_OP
+%token LAND
+%token LOR
+%token NEQ
+%token EQ
+%token GEQ
+%token LEQ
+%token SHL
+%token SHR
 
 /* Types */
 
@@ -141,21 +141,42 @@
 %token INT_64_T
 %token UINT_64_T
 
+/* Single character */
+
+%token '|' OR
+%token '^' XOR
+%token '&' AND
+%token '<' LESS
+%token '>' GREATER
+%token '+' ADD
+%token '-' SUB
+%token '*' MUL
+%token '/' DIV
+%token '%' MOD
+%token ';' SEMICOLON
+%token '=' ASSIGN
+%token '(' LPAREN
+%token ')' RPAREN
+%token ',' COMA
+%token '{' LBRACKET
+%token '}' RBRACKET
+
 /* Associativeness */
 
-%right '=' MUL_ASSIGN DIV_ASSIGN
-		MOD_ASSIGN ADD_ASSIGN SUB_ASSIGN SHL_ASSIGN
-		SHR_ASSIGN AND_ASSIGN XOR_ASSIGN OR_ASSIGN
-%left LOR_OP
-%left LAND_OP
-%left '|'
-%left '^'
-%left '&'
-%left EQ_OP NEQ_OP
-%left LEQ_OP GEQ_OP '<' '>'
-%left SHL_OP SHR_OP
-%left '+' '-'
-%left '*' '/' '%'
+%right
+	ASSIGN MUL_ASSIGN DIV_ASSIGN
+	MOD_ASSIGN ADD_ASSIGN SUB_ASSIGN SHL_ASSIGN
+	SHR_ASSIGN AND_ASSIGN XOR_ASSIGN OR_ASSIGN
+%left LOR
+%left LAND
+%left OR
+%left XOR
+%left AND
+%left EQ NEQ
+%left LEQ GEQ LESS GREATER
+%left SHL SHR
+%left ADD SUB
+%left MUL /* /*
 
 /* Precedence */
 
@@ -215,8 +236,8 @@ external_declaration
     ;
 
 declaration
-    : type_specifier IDENTIFIER ';' { $$ = new nezoku::Declaration($1, $2); };
-    | type_specifier IDENTIFIER '=' expression ';' { $$ = new nezoku::Declaration($1, $2, $4); };
+    : type_specifier IDENTIFIER SEMICOLON { $$ = new nezoku::Declaration($1, $2); };
+    | type_specifier IDENTIFIER ASSIGN expression SEMICOLON { $$ = new nezoku::Declaration($1, $2, $4); };
     ;
 
 type_specifier
@@ -235,7 +256,7 @@ type_specifier
     ;
 
 function_definition
-    : type_specifier IDENTIFIER '(' parameter_list ')' statement {
+    : type_specifier IDENTIFIER LPAREN parameter_list RPAREN statement {
 		$$ = new nezoku::FunctionDefinition($1, $2, std::move($4), $6);
 	};
     ;
@@ -246,15 +267,15 @@ parameter_list
 		$$ = std::vector<std::pair<nezoku::TypeSpecifier, std::string>>();
 		$$.push_back(std::make_pair($1, $2));
 	};
-    | parameter_list ',' type_specifier IDENTIFIER {
+    | parameter_list COMA type_specifier IDENTIFIER {
 		$1.push_back(std::make_pair($3, $4));
 		$$ = $1;
 	};
     ;
 
 compound_statement
-    : '{' '}' { $$ = new nezoku::CompoundStatement(); };
-    | '{' block_item_list '}' { $$ = new nezoku::CompoundStatement(std::move($2)); };
+    : LBRACKET RBRACKET { $$ = new nezoku::CompoundStatement(); };
+    | LBRACKET block_item_list RBRACKET { $$ = new nezoku::CompoundStatement(std::move($2)); };
     ;
 
 block_item_list
@@ -282,38 +303,38 @@ statement
     ;
 
 selection_statement
-    : IF_KW '(' expression ')' statement %prec "then" { $$ = new nezoku::SelectionStatement($3, $5); };
-    | IF_KW '(' expression ')' statement ELSE_KW statement { $$ = new nezoku::SelectionStatement($3, $5, $7); };
+    : IF_KW LPAREN expression RPAREN statement %prec "then" { $$ = new nezoku::SelectionStatement($3, $5); };
+    | IF_KW LPAREN expression RPAREN statement ELSE_KW statement { $$ = new nezoku::SelectionStatement($3, $5, $7); };
     ;
 
 iteration_statement
-    : WHILE_KW '(' expression ')' statement {
+    : WHILE_KW LPAREN expression RPAREN statement {
 		auto iteration_statement = new nezoku::IterationStatement();
 		iteration_statement->add_condition($3);
 		iteration_statement->add_statement($5);
 		$$ = iteration_statement;
 	};
     /*
-	| FOR_KW '(' expression_statement expression_statement ')' statement {
+	| FOR_KW LPAREN expression_statement expression_statement RPAREN statement {
 		$$ = new nezoku::IterationStatement();
 		$$->add_initialization($3);
 		$$->add_condition($4);
 		$$->add_statement($6);
 	};
-	| FOR_KW '(' expression_statement expression_statement expression ')' statement {
+	| FOR_KW LPAREN expression_statement expression_statement expression RPAREN statement {
 		$$ = new nezoku::IterationStatement();
 		$$->add_initialization($3);
 		$$->add_condition($4);
 		$$->add_updation($5);
 		$$->add_statement($7);
 	};
-	| FOR_KW '(' declaration expression_statement ')' statement {
+	| FOR_KW LPAREN declaration expression_statement RPAREN statement {
 		$$ = new nezoku::IterationStatement();
 		$$->add_initialization($3);
 		$$->add_condition($4);
 		$$->add_statement($6);
 	};
-	| FOR_KW '(' declaration expression_statement expression ')' statement {
+	| FOR_KW LPAREN declaration expression_statement expression RPAREN statement {
 		$$ = new nezoku::IterationStatement();
 		$$->add_initialization($3);
 		$$->add_condition($4);
@@ -324,20 +345,20 @@ iteration_statement
     ;
 
 jump_statement
-    : CONTINUE_KW ';' { $$ = new nezoku::ContinueStatement(); };
-    | BREAK_KW ';' { $$ = new nezoku::BreakStatement(); };
-    | RETURN_KW ';' { $$ = new nezoku::ReturnStatement(); };
-    | RETURN_KW expression ';' { $$ = new nezoku::ReturnStatement($2); };
+    : CONTINUE_KW SEMICOLON { $$ = new nezoku::ContinueStatement(); };
+    | BREAK_KW SEMICOLON { $$ = new nezoku::BreakStatement(); };
+    | RETURN_KW SEMICOLON { $$ = new nezoku::ReturnStatement(); };
+    | RETURN_KW expression SEMICOLON { $$ = new nezoku::ReturnStatement($2); };
     ;
 
 expression_statement
-    : ';' { $$ = new nezoku::ExpressionStatement(); };
-    | expression ';' { $$ = new nezoku::ExpressionStatement($1); };
+    : SEMICOLON { $$ = new nezoku::ExpressionStatement(); };
+    | expression SEMICOLON { $$ = new nezoku::ExpressionStatement($1); };
     ;
 
 expression
 	: assignment_expression { $$ = $1; };
-	| expression ',' assignment_expression { $$ = new nezoku::CommaExpression($1, $3); };
+	/* | expression COMA assignment_expression { $$ = new nezoku::CommaExpression($1, $3); }; */
 	;
 
 assignment_expression
@@ -348,7 +369,7 @@ assignment_expression
 	;
 
 assignment_operator
-	: '=' { $$ = nezoku::AssignmentOperator::Assign; };
+	: ASSIGN { $$ = nezoku::AssignmentOperator::Assign; };
 	| MUL_ASSIGN { $$ = nezoku::AssignmentOperator::MulAssign; };
 	| DIV_ASSIGN { $$ = nezoku::AssignmentOperator::DivAssign; };
 	| MOD_ASSIGN { $$ = nezoku::AssignmentOperator::ModAssign; };
@@ -363,67 +384,67 @@ assignment_operator
 
 logical_or_expression
 	: logical_and_expression { $$ = $1; };
-	| logical_or_expression LOR_OP logical_and_expression { $$ = new nezoku::LorExpression($1, $3); };
+	| logical_or_expression LOR logical_and_expression { $$ = new nezoku::LorExpression($1, $3); };
 	;
 
 logical_and_expression
 	: inclusive_or_expression { $$ = $1; };
-	| logical_and_expression LAND_OP inclusive_or_expression { $$ = new nezoku::LandExpression($1, $3); };
+	| logical_and_expression LAND inclusive_or_expression { $$ = new nezoku::LandExpression($1, $3); };
 	;
 
 inclusive_or_expression
 	: exclusive_or_expression { $$ = $1; };
-	| inclusive_or_expression '|' exclusive_or_expression { $$ = new nezoku::OrExpression($1, $3); };
+	| inclusive_or_expression OR exclusive_or_expression { $$ = new nezoku::OrExpression($1, $3); };
 	;
 
 exclusive_or_expression
 	: and_expression { $$ = $1; };
-	| exclusive_or_expression '^' and_expression { $$ = new nezoku::XorExpression($1, $3); };
+	| exclusive_or_expression XOR and_expression { $$ = new nezoku::XorExpression($1, $3); };
 	;
 
 and_expression
 	: equality_expression { $$ = $1; };
-	| and_expression '&' equality_expression { $$ = new nezoku::AndExpression($1, $3); };
+	| and_expression AND equality_expression { $$ = new nezoku::AndExpression($1, $3); };
 	;
 
 equality_expression
 	: relational_expression { $$ = $1; };
-	| equality_expression EQ_OP relational_expression { $$ = new nezoku::EqExpression($1, $3); };
-	| equality_expression NEQ_OP relational_expression { $$ = new nezoku::NeqExpression($1, $3); };
+	| equality_expression EQ relational_expression { $$ = new nezoku::EqExpression($1, $3); };
+	| equality_expression NEQ relational_expression { $$ = new nezoku::NeqExpression($1, $3); };
 	;
 
 relational_expression
 	: shift_expression { $$ = $1; };
-	| relational_expression '<' shift_expression { $$ = new nezoku::LessExpression($1, $3); };
-	| relational_expression '>' shift_expression { $$ = new nezoku::GreaterExpression($1, $3); };
-	| relational_expression LEQ_OP shift_expression { $$ = new nezoku::LeqExpression($1, $3); };
-	| relational_expression GEQ_OP shift_expression { $$ = new nezoku::GeqExpression($1, $3); };
+	| relational_expression LESS shift_expression { $$ = new nezoku::LessExpression($1, $3); };
+	| relational_expression GREATER shift_expression { $$ = new nezoku::GreaterExpression($1, $3); };
+	| relational_expression LEQ shift_expression { $$ = new nezoku::LeqExpression($1, $3); };
+	| relational_expression GEQ shift_expression { $$ = new nezoku::GeqExpression($1, $3); };
 	;
 
 shift_expression
 	: additive_expression { $$ = $1; };
-	| shift_expression SHL_OP additive_expression { $$ = new nezoku::ShlExpression($1, $3); };
-	| shift_expression SHR_OP additive_expression { $$ = new nezoku::ShrExpression($1, $3); };
+	| shift_expression SHL additive_expression { $$ = new nezoku::ShlExpression($1, $3); };
+	| shift_expression SHR additive_expression { $$ = new nezoku::ShrExpression($1, $3); };
 	;
 
 additive_expression
 	: multiplicative_expression { $$ = $1; };
-	| additive_expression '+' multiplicative_expression { $$ = new nezoku::AddExpression($1, $3); };
-	| additive_expression '-' multiplicative_expression { $$ = new nezoku::SubExpression($1, $3); };
+	| additive_expression ADD multiplicative_expression { $$ = new nezoku::AddExpression($1, $3); };
+	| additive_expression SUB multiplicative_expression { $$ = new nezoku::SubExpression($1, $3); };
 	;
 
 multiplicative_expression
     : primary_expression { $$ = $1; };
-	| multiplicative_expression '*' primary_expression { $$ = new nezoku::MulExpression($1, $3); };
-	| multiplicative_expression '/' primary_expression { $$ = new nezoku::DivExpression($1, $3); };
-	| multiplicative_expression '%' primary_expression { $$ = new nezoku::ModExpression($1, $3); };
+	| multiplicative_expression MUL primary_expression { $$ = new nezoku::MulExpression($1, $3); };
+	| multiplicative_expression DIV primary_expression { $$ = new nezoku::DivExpression($1, $3); };
+	| multiplicative_expression MOD primary_expression { $$ = new nezoku::ModExpression($1, $3); };
 	;
 
 primary_expression
     : IDENTIFIER { $$ = new nezoku::IdentifierExpression($1); };
     | CONSTANT { $$ = new nezoku::ConstantExpression($1); };
 	| STRING_LITERAL { $$ = new nezoku::StringExpression($1); };
-	| '(' expression ')' { $$ = $2; };
+	| LPAREN expression RPAREN { $$ = $2; };
     ;
 
 %%

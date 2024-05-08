@@ -9,44 +9,45 @@
 
 namespace nezoku {
 
-class PrintingVisitor: public Visitor {
+class PrintingVisitor final: public Visitor {
 public:
     PrintingVisitor(const std::string& file);
     ~PrintingVisitor();
 
-    void visit(TranslationUnit* translation_unit);
-    void visit(FunctionDefinition* function_definition);
-    void visit(Declaration* declaration);
-    
-    void visit(Statement* statement);
-    void visit(CompoundStatement* compound_statement);
-    void visit(ExpressionStatement* expression_statement);
-    void visit(ReturnStatement* return_statement);
-    void visit(ContinueStatement* continue_statement);
-    void visit(BreakStatement* break_statement);
-    void visit(SelectionStatement* selection_statement);
-    void visit(IterationStatement* iteration_statement);
+    void visit(TranslationUnit* translation_unit) override;
+    void visit(FunctionDefinition* function_definition) override;
+    void visit(Declaration* declaration) override;
 
-    void visit(Expression* expression);
-    void visit(AssignmentExpression* assignment_expression);
-    void visit(LorExpression* logical_or_expression);
-    void visit(LandExpression* logical_and_expression);
-    void visit(OrExpression* inclusive_or_expression);
-    void visit(XorExpression* exclusive_or_expression);
-    void visit(AndExpression* and_expression);
-    void visit(EqExpression* eq_expression);
-    void visit(NeqExpression* neq_expression);
-    void visit(LessExpression* less_expression);
-    void visit(GreaterExpression* greater_expression);
-    void visit(LeqExpression* leq_expression);
-    void visit(GeqExpression* geq_expression);
-    void visit(ShlExpression* shl_expression);
-    void visit(ShrExpression* shr_expression);
-    void visit(AddExpression* add_expression);
-    void visit(SubExpression* sub_expression);
-    void visit(MulExpression* mul_expression);
-    void visit(DivExpression* div_expression);
-    void visit(ModExpression* mod_expression);
+    void visit(CompoundStatement* compound_statement) override;
+    void visit(ExpressionStatement* expression_statement) override;
+    void visit(ReturnStatement* return_statement) override;
+    void visit(ContinueStatement* continue_statement) override;
+    void visit(BreakStatement* break_statement) override;
+    void visit(SelectionStatement* selection_statement) override;
+    void visit(IterationStatement* iteration_statement) override;
+
+    void visit(AssignmentExpression* assignment_expression) override;
+    void visit(LorExpression* logical_or_expression) override;
+    void visit(LandExpression* logical_and_expression) override;
+    void visit(OrExpression* inclusive_or_expression) override;
+    void visit(XorExpression* exclusive_or_expression) override;
+    void visit(AndExpression* and_expression) override;
+    void visit(EqExpression* eq_expression) override;
+    void visit(NeqExpression* neq_expression) override;
+    void visit(LessExpression* less_expression) override;
+    void visit(GreaterExpression* greater_expression) override;
+    void visit(LeqExpression* leq_expression) override;
+    void visit(GeqExpression* geq_expression) override;
+    void visit(ShlExpression* shl_expression) override;
+    void visit(ShrExpression* shr_expression) override;
+    void visit(AddExpression* add_expression) override;
+    void visit(SubExpression* sub_expression) override;
+    void visit(MulExpression* mul_expression) override;
+    void visit(DivExpression* div_expression) override;
+    void visit(ModExpression* mod_expression) override;
+    void visit(IdentifierExpression* identifier_expression) override;
+    void visit(ConstantExpression* constant_expression) override;
+    void visit(StringExpression* string_expression) override;
 
 private:
     void print_tabs();

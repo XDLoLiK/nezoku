@@ -34,6 +34,9 @@
 #include "ast/mul_expression.hpp"
 #include "ast/div_expression.hpp"
 #include "ast/mod_expression.hpp"
+#include "ast/identifier_expression.hpp"
+#include "ast/constant_expression.hpp"
+#include "ast/string_expression.hpp"
 
 #include "ast/type_specifier.hpp"
 #include "ast/assignment_operator.hpp"
@@ -105,8 +108,18 @@ void PrintingVisitor::visit(Declaration* declaration) {
     auto type = declaration->variable_type();
     auto id = declaration->variable_name();
     print_tabs();
-    stream_ << "[variable]: " << type_specifier_str(type) << " " << id << std::endl;
+    stream_ << "[variable]:" << std::endl;
+    tabs_++;
+
+    print_tabs();
+    stream_ << "[type]: " << type_specifier_str(type) << std::endl;
+    
+    print_tabs();
+    stream_ << "[id]: " << id << std::endl;
+    
     auto init_expr = declaration->initializer();
+    print_tabs();
+    stream_ << "[init]:" << std::endl;
 
     if (init_expr) {
         tabs_++;
@@ -136,16 +149,13 @@ void PrintingVisitor::visit(FunctionDefinition* function_definition) {
     tabs_--;
     print_tabs();
     stream_ << "[body]:" << std::endl;
+    tabs_++;
 
     if (body) {
         body->accept_visitor(this);
     }
 
-    tabs_--;
-}
-
-void PrintingVisitor::visit(Statement* statement) {
-    statement->accept_visitor(this);
+    tabs_ -= 2;
 }
 
 void PrintingVisitor::visit(CompoundStatement* compound_statement) {
@@ -170,7 +180,7 @@ void PrintingVisitor::visit(ExpressionStatement* expression_statement) {
 
 void PrintingVisitor::visit(ReturnStatement* return_statement) {
     print_tabs();
-    stream_ << "return" << std::endl;
+    stream_ << "[op]: return" << std::endl;
     tabs_++;
     auto expression = return_statement->expression();
 
@@ -183,46 +193,63 @@ void PrintingVisitor::visit(ReturnStatement* return_statement) {
 
 void PrintingVisitor::visit([[maybe_unused]] ContinueStatement* continue_statement) {
     print_tabs();
-    stream_ << "continue" << std::endl;
+    stream_ << "[op]: continue" << std::endl;
 }
 
 void PrintingVisitor::visit([[maybe_unused]] BreakStatement* break_statement) {
     print_tabs();
-    stream_ << "break" << std::endl;
+    stream_ << "[op]: break" << std::endl;
 }
 
 void PrintingVisitor::visit(SelectionStatement* selection_statement) {
     print_tabs();
-    stream_ << "branch" << std::endl;
+    stream_ << "[branch]:" << std::endl;
     tabs_++;
 
     print_tabs();
     stream_ << "[if]:" << std::endl;
+    tabs_++;
     auto if_cond = selection_statement->if_expression();
     if_cond->accept_visitor(this);
+    tabs_--;
     
     print_tabs();
     stream_ << "[then]:" << std::endl;
+    tabs_++;
     auto if_body = selection_statement->then_statement();
     if_body->accept_visitor(this);
-    
+    tabs_--;
+
     print_tabs();
     stream_ << "[else]:" << std::endl;
+    tabs_++;
     auto else_body = selection_statement->else_statement();
 
     if (else_body) {
         else_body->accept_visitor(this);
     }
 
-    tabs_--;
+    tabs_ -= 2;
 }
 
 void PrintingVisitor::visit([[maybe_unused]] IterationStatement* iteration_statement) {
-    // TODO: Implement.
-}
+    print_tabs();
+    stream_ << "[loop]:" << std::endl;
+    tabs_++;
 
-void PrintingVisitor::visit(Expression* expression) {
-    expression->accept_visitor(this);
+    print_tabs();
+    stream_ << "[cond]:" << std::endl;
+    tabs_++;
+    auto cond = iteration_statement->condition();
+    cond->accept_visitor(this);
+    tabs_--;
+
+    print_tabs();
+    stream_ << "[body]:" << std::endl;
+    tabs_++;
+    auto body = iteration_statement->body();
+    body->accept_visitor(this);
+    tabs_ -= 2;
 }
 
 void PrintingVisitor::visit(AssignmentExpression* assignment_expression) {
@@ -307,6 +334,21 @@ void PrintingVisitor::visit(DivExpression* div_expression) {
 
 void PrintingVisitor::visit(ModExpression* mod_expression) {
     visit_binary_op(mod_expression, "%");
+}
+
+void PrintingVisitor::visit(IdentifierExpression* identifier_expression) {
+    print_tabs();
+    stream_ << "[id]: " << identifier_expression->identifier() << std::endl;
+}
+
+void PrintingVisitor::visit(ConstantExpression* constant_expression) {
+    print_tabs();
+    stream_ << "[const]: " << constant_expression->constant() << std::endl;
+}
+
+void PrintingVisitor::visit(StringExpression* string_expression) {
+    print_tabs();
+    stream_ << "[string]: " << string_expression->string() << std::endl;
 }
 
 template<class T>
