@@ -1223,7 +1223,7 @@ YY_RULE_SETUP
 case 54:
 YY_RULE_SETUP
 #line 121 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
-{ return yy::parser::make_COMA(loc); }
+{ return yy::parser::make_COMMA(loc); }
 	YY_BREAK
 case 55:
 YY_RULE_SETUP

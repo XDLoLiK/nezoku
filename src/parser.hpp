@@ -586,7 +586,7 @@ namespace yy {
     ASSIGN = 309,                  // ASSIGN
     LPAREN = 310,                  // LPAREN
     RPAREN = 311,                  // RPAREN
-    COMA = 312,                    // COMA
+    COMMA = 312,                   // COMMA
     LBRACKET = 313,                // LBRACKET
     RBRACKET = 314                 // RBRACKET
       };
@@ -679,7 +679,7 @@ namespace yy {
         S_69_ = 69,                              // ')'
         S_RPAREN = 70,                           // RPAREN
         S_71_ = 71,                              // ','
-        S_COMA = 72,                             // COMA
+        S_COMMA = 72,                            // COMMA
         S_73_ = 73,                              // '{'
         S_LBRACKET = 74,                         // LBRACKET
         S_75_ = 75,                              // '}'
@@ -1228,7 +1228,7 @@ switch (yykind)
                    || tok == 41
                    || tok == token::RPAREN
                    || tok == 44
-                   || tok == token::COMA
+                   || tok == token::COMMA
                    || tok == 123
                    || tok == token::LBRACKET
                    || tok == 125
@@ -2153,16 +2153,16 @@ switch (yykind)
 #if 201103L <= YY_CPLUSPLUS
       static
       symbol_type
-      make_COMA (location_type l)
+      make_COMMA (location_type l)
       {
-        return symbol_type (token::COMA, std::move (l));
+        return symbol_type (token::COMMA, std::move (l));
       }
 #else
       static
       symbol_type
-      make_COMA (const location_type& l)
+      make_COMMA (const location_type& l)
       {
-        return symbol_type (token::COMA, l);
+        return symbol_type (token::COMMA, l);
       }
 #endif
 #if 201103L <= YY_CPLUSPLUS

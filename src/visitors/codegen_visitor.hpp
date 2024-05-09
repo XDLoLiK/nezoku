@@ -3,8 +3,10 @@
 
 #include <memory>
 #include <fstream>
+#include <functional>
 #include <cassert>
 #include <string>
+#include <stack>
 
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/LLVMContext.h"
@@ -55,6 +57,10 @@ public:
     void visit(StringExpression* string_expression) override;
 
 private:
+    template<class T>
+    void visit_binary_op(T* binary_op, std::function<llvm::Value* (llvm::Value*, llvm::Value*)> op_func);
+
+private:
     size_t tabs_{0};
     std::ofstream stream_;
     llvm::LLVMContext context_{};
@@ -62,6 +68,7 @@ private:
     std::unique_ptr<llvm::Module> module_;
     FunctionDefinition* current_function_{nullptr};
     llvm::BasicBlock* current_block_{nullptr};
+    std::stack<llvm::Value*> latest_values_;
 };
 
 }; // namespace nezoku

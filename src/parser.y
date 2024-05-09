@@ -159,7 +159,7 @@
 %token '=' ASSIGN
 %token '(' LPAREN
 %token ')' RPAREN
-%token ',' COMA
+%token ',' COMMA
 %token '{' LBRACKET
 %token '}' RBRACKET
 
@@ -215,6 +215,7 @@
 %nterm <nezoku::Expression*> additive_expression
 %nterm <nezoku::Expression*> multiplicative_expression
 %nterm <nezoku::Expression*> primary_expression
+/* %nterm <std::vector<nezoku::Expression*>> argument_expression_list */
 
 %%
 
@@ -270,7 +271,7 @@ parameter_list
 		$$ = std::vector<std::pair<nezoku::TypeSpecifier, std::string>>();
 		$$.push_back(std::make_pair($1, $2));
 	};
-    | parameter_list COMA type_specifier IDENTIFIER {
+    | parameter_list COMMA type_specifier IDENTIFIER {
 		$1.push_back(std::make_pair($3, $4));
 		$$ = $1;
 	};
@@ -361,7 +362,7 @@ expression_statement
 
 expression
 	: assignment_expression { $$ = $1; };
-	/* | expression COMA assignment_expression { $$ = new nezoku::CommaExpression($1, $3); }; */
+	/* | expression COMMA assignment_expression { $$ = new nezoku::CommaExpression($1, $3); }; */
 	;
 
 assignment_expression
@@ -448,7 +449,21 @@ primary_expression
     | CONSTANT { $$ = new nezoku::ConstantExpression($1); };
 	| STRING_LITERAL { $$ = new nezoku::StringExpression($1); };
 	| LPAREN expression RPAREN { $$ = $2; };
+	/* | IDENTIFIER LPAREN argument_expression_list RPAREN { $$ = new nezoku::FunctionCallExpression($1, $3); }; */
     ;
+
+/*
+	argument_expression_list
+	: expression {
+		$$ = std::vector<nezoku::Expression*>();
+		$$.push_back($1);
+	};
+	| argument_expression_list COMMA assignment_expression {
+		$1.push_back($3);
+		$$ = $1;
+	};
+	;
+*/
 
 %%
 
