@@ -24,8 +24,10 @@
 	#include "ast/assignment_operator.hpp"
 
 	namespace nezoku {
-		class Driver;
-		class Scanner;
+	
+	class Driver;
+	class Scanner;
+	
 	}; // namespace nezoku
 }
 

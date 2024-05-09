@@ -17,6 +17,7 @@ class Driver {
 
 public:
     Driver();
+    ~Driver();
     
     int parse(const std::string& file_name);
     void print_tree(const std::string& filename);

@@ -10,6 +10,10 @@ Driver::Driver()
     , parser(*this, scanner) {
 }
 
+Driver::~Driver() {
+    delete program;
+}
+
 int Driver::parse(const std::string& f) {
     file = f;
     location.initialize(&file);

@@ -61,11 +61,13 @@
 	#include "ast/assignment_operator.hpp"
 
 	namespace nezoku {
-		class Driver;
-		class Scanner;
+	
+	class Driver;
+	class Scanner;
+	
 	}; // namespace nezoku
 
-#line 69 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.hpp"
+#line 71 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.hpp"
 
 # include <cassert>
 # include <cstdlib> // std::abort
@@ -205,7 +207,7 @@
 #endif
 
 namespace yy {
-#line 209 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.hpp"
+#line 211 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.hpp"
 
 
 
@@ -2829,7 +2831,7 @@ switch (yykind)
 
 
 } // yy
-#line 2833 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.hpp"
+#line 2835 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.hpp"
 
 
 
