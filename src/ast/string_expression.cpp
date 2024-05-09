@@ -7,8 +7,6 @@ namespace nezoku {
 StringExpression::StringExpression(std::string str)
     : string_(str) {}
 
-StringExpression::~StringExpression() {}
-
 void StringExpression::accept_visitor(Visitor* visitor) {
     visitor->visit(this);
 }

@@ -11,9 +11,9 @@ namespace nezoku {
 class ConstantExpression: public Expression {
 public:
     ConstantExpression(std::string constant);
-    ~ConstantExpression();
+    virtual ~ConstantExpression() = default;
 
-    void accept_visitor(Visitor* visitor);
+    void accept_visitor(Visitor* visitor) override;
 
     [[nodiscard]]
     auto constant() const noexcept -> const std::string&;

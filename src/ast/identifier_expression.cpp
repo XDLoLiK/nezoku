@@ -7,8 +7,6 @@ namespace nezoku {
 IdentifierExpression::IdentifierExpression(std::string identifier)
     : identifier_(identifier) {}
 
-IdentifierExpression::~IdentifierExpression() {}
-
 void IdentifierExpression::accept_visitor(Visitor* visitor) {
     visitor->visit(this);
 }

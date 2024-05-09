@@ -3,8 +3,6 @@
 
 namespace nezoku {
 
-BreakStatement::~BreakStatement() {}
-
 void BreakStatement::accept_visitor(Visitor* visitor) {
     visitor->visit(this);
 }

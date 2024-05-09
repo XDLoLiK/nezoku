@@ -8,8 +8,6 @@ namespace nezoku {
 template<class... Ts> struct DeletingVisitor: Ts... { using Ts::operator()...; };
 template<class... Ts> DeletingVisitor(Ts...) -> DeletingVisitor<Ts...>;
 
-CompoundStatement::CompoundStatement() {}
-
 CompoundStatement::CompoundStatement(std::vector<BlockItem> block_item_list)
     : block_item_list_(std::move(block_item_list)) {}
 

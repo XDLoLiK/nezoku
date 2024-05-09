@@ -11,9 +11,9 @@ namespace nezoku {
 class IdentifierExpression: public Expression {
 public:
     IdentifierExpression(std::string identifier);
-    ~IdentifierExpression();
+    virtual ~IdentifierExpression() = default;
 
-    void accept_visitor(Visitor* visitor);
+    void accept_visitor(Visitor* visitor) override;
 
     [[nodiscard]]
     auto identifier() const noexcept -> const std::string&;

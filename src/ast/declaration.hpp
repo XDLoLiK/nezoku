@@ -13,9 +13,9 @@ namespace nezoku {
 class Declaration: public Accepter {
 public:
     Declaration(TypeSpecifier type, std::string id, Expression* initializer = nullptr);
-    ~Declaration();
+    ~Declaration() override;
   
-    void accept_visitor(Visitor* visitor);
+    void accept_visitor(Visitor* visitor) override;
 
     [[nodiscard]]
     auto variable_type() const noexcept -> TypeSpecifier;

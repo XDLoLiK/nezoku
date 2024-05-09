@@ -10,9 +10,9 @@ namespace nezoku {
 class AssignmentExpression: public Expression {
 public:
     AssignmentExpression(Expression* left, AssignmentOperator op, Expression* right);
-    ~AssignmentExpression();
+    ~AssignmentExpression() override;
 
-    void accept_visitor(Visitor* visitor);
+    void accept_visitor(Visitor* visitor) override;
 
     [[nodiscard]]
     auto left_expression() const noexcept -> Expression*;

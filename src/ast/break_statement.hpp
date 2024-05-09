@@ -8,9 +8,9 @@ namespace nezoku {
 
 class BreakStatement: public Statement {
 public:
-    ~BreakStatement();
+    virtual ~BreakStatement() = default;
 
-    void accept_visitor(Visitor* visitor);
+    void accept_visitor(Visitor* visitor) override;
 };
 
 }; // namespace nezoku

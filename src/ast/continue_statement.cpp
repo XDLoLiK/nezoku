@@ -3,8 +3,6 @@
 
 namespace nezoku {
 
-ContinueStatement::~ContinueStatement() {}
-
 void ContinueStatement::accept_visitor(Visitor* visitor) {
     visitor->visit(this);
 }

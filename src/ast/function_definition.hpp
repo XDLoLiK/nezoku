@@ -16,9 +16,9 @@ class FunctionDefinition: public Accepter {
 public:
     FunctionDefinition(TypeSpecifier return_type, std::string id,
                        std::vector<FunctionParameter> parameters, Statement* body);
-    ~FunctionDefinition();
+    ~FunctionDefinition() override;
 
-    void accept_visitor(Visitor* visitor);
+    void accept_visitor(Visitor* visitor) override;
 
     [[nodiscard]]
     auto return_type() const noexcept -> TypeSpecifier;

@@ -11,9 +11,9 @@ namespace nezoku {
 class StringExpression: public Expression {
 public:
     StringExpression(std::string str);
-    ~StringExpression();
+    virtual ~StringExpression() = default;
 
-    void accept_visitor(Visitor* visitor);
+    void accept_visitor(Visitor* visitor) override;
 
     [[nodiscard]]
     auto string() const noexcept -> const std::string&;

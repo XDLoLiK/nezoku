@@ -9,9 +9,9 @@ namespace nezoku {
 class LandExpression: public Expression {
 public:
     LandExpression(Expression* left, Expression* right);
-    ~LandExpression();
+    ~LandExpression() override;
 
-    void accept_visitor(Visitor* visitor);
+    void accept_visitor(Visitor* visitor) override;
 
     [[nodiscard]]
     auto left_expression() const noexcept -> Expression*;

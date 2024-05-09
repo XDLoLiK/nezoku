@@ -9,9 +9,9 @@ namespace nezoku {
 class ShlExpression: public Expression {
 public:
     ShlExpression(Expression* left, Expression* right);
-    ~ShlExpression();
+    ~ShlExpression() override;
 
-    void accept_visitor(Visitor* visitor);
+    void accept_visitor(Visitor* visitor) override;
 
     [[nodiscard]]
     auto left_expression() const noexcept -> Expression*;

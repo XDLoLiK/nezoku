@@ -9,9 +9,9 @@ namespace nezoku {
 class DivExpression: public Expression {
 public:
     DivExpression(Expression* left, Expression* right);
-    ~DivExpression();
+    ~DivExpression() override;
 
-    void accept_visitor(Visitor* visitor);
+    void accept_visitor(Visitor* visitor) override;
 
     [[nodiscard]]
     auto left_expression() const noexcept -> Expression*;

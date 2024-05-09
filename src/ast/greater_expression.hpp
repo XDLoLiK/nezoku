@@ -9,9 +9,9 @@ namespace nezoku {
 class GreaterExpression: public Expression {
 public:
     GreaterExpression(Expression* left, Expression* right);
-    ~GreaterExpression();
+    ~GreaterExpression() override;
 
-    void accept_visitor(Visitor* visitor);
+    void accept_visitor(Visitor* visitor) override;
 
     [[nodiscard]]
     auto left_expression() const noexcept -> Expression*;

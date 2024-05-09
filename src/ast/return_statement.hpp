@@ -9,9 +9,9 @@ namespace nezoku {
 class ReturnStatement: public Statement {
 public:
     ReturnStatement(Expression* expression = nullptr);
-    ~ReturnStatement();
+    ~ReturnStatement() override;
 
-    void accept_visitor(Visitor* visitor);
+    void accept_visitor(Visitor* visitor) override;
 
     [[nodiscard]]
     auto expression() const noexcept -> Expression*;

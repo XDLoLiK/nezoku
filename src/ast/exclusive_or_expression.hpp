@@ -9,9 +9,9 @@ namespace nezoku {
 class XorExpression: public Expression {
 public:
     XorExpression(Expression* left, Expression* right);
-    ~XorExpression();
+    ~XorExpression() override;
 
-    void accept_visitor(Visitor* visitor);
+    void accept_visitor(Visitor* visitor) override;
 
     [[nodiscard]]
     auto left_expression() const noexcept -> Expression*;

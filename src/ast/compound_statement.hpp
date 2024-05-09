@@ -15,11 +15,10 @@ class CompoundStatement: public Statement {
     using BlockItem = std::variant<Declaration*, Statement*>;
 
 public:
-    CompoundStatement();
-    CompoundStatement(std::vector<BlockItem> block_item_list);
-    ~CompoundStatement();
+    CompoundStatement(std::vector<BlockItem> block_item_list = std::vector<BlockItem>());
+    ~CompoundStatement() override;
 
-    void accept_visitor(Visitor* visitor);
+    void accept_visitor(Visitor* visitor) override;
 
     [[nodiscard]]
     auto block_item_list() const noexcept -> const std::vector<BlockItem>&;

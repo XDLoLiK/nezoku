@@ -7,8 +7,6 @@ namespace nezoku {
 ConstantExpression::ConstantExpression(std::string constant)
     : constant_(constant) {}
 
-ConstantExpression::~ConstantExpression() {}
-
 void ConstantExpression::accept_visitor(Visitor* visitor) {
     visitor->visit(this);
 }

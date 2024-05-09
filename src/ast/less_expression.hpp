@@ -9,9 +9,9 @@ namespace nezoku {
 class LessExpression: public Expression {
 public:
     LessExpression(Expression* left, Expression* right);
-    ~LessExpression();
+    ~LessExpression() override;
 
-    void accept_visitor(Visitor* visitor);
+    void accept_visitor(Visitor* visitor) override;
 
     [[nodiscard]]
     auto left_expression() const noexcept -> Expression*;

@@ -8,9 +8,9 @@ namespace nezoku {
 
 class IterationStatement: public Statement {
 public:
-    ~IterationStatement();
+    ~IterationStatement() override;
 
-    void accept_visitor(Visitor* visitor);
+    void accept_visitor(Visitor* visitor) override;
 
     void add_condition(Expression* condition);
     void add_statement(Statement* statement);

@@ -8,9 +8,9 @@ namespace nezoku {
 
 class ContinueStatement: public Statement {
 public:
-    ~ContinueStatement();
+    virtual ~ContinueStatement() = default;
 
-    void accept_visitor(Visitor* visitor);
+    void accept_visitor(Visitor* visitor) override;
 };
 
 }; // namespace nezoku
