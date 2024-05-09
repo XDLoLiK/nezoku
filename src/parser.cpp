@@ -916,559 +916,560 @@ namespace yy {
                            {
 		yylhs.value.as < nezoku::TranslationUnit* > () = new nezoku::TranslationUnit();
 		yylhs.value.as < nezoku::TranslationUnit* > ()->add_external_declaration(std::move(yystack_[0].value.as < std::variant<nezoku::Declaration*, nezoku::FunctionDefinition*> > ()));
+		// TODO: Support multiple translation units.
 		driver.translation_unit(yylhs.value.as < nezoku::TranslationUnit* > ());
 	}
-#line 922 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 923 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 3: // translation_unit: translation_unit external_declaration
-#line 229 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 230 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                             {
 		yystack_[1].value.as < nezoku::TranslationUnit* > ()->add_external_declaration(std::move(yystack_[0].value.as < std::variant<nezoku::Declaration*, nezoku::FunctionDefinition*> > ()));
 		yylhs.value.as < nezoku::TranslationUnit* > () = yystack_[1].value.as < nezoku::TranslationUnit* > ();
 	}
-#line 931 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 932 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 4: // external_declaration: declaration
-#line 236 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 237 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                   { yylhs.value.as < std::variant<nezoku::Declaration*, nezoku::FunctionDefinition*> > () = std::variant<nezoku::Declaration*, nezoku::FunctionDefinition*>(yystack_[0].value.as < nezoku::Declaration* > ()); }
-#line 937 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 938 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 5: // external_declaration: function_definition
-#line 237 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 238 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                           { yylhs.value.as < std::variant<nezoku::Declaration*, nezoku::FunctionDefinition*> > () = std::variant<nezoku::Declaration*, nezoku::FunctionDefinition*>(yystack_[0].value.as < nezoku::FunctionDefinition* > ()); }
-#line 943 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 944 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 6: // declaration: type_specifier IDENTIFIER SEMICOLON
-#line 241 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 242 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                           { yylhs.value.as < nezoku::Declaration* > () = new nezoku::Declaration(yystack_[2].value.as < nezoku::TypeSpecifier > (), yystack_[1].value.as < std::string > ()); }
-#line 949 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 950 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 7: // declaration: type_specifier IDENTIFIER ASSIGN expression SEMICOLON
-#line 242 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 243 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                                             { yylhs.value.as < nezoku::Declaration* > () = new nezoku::Declaration(yystack_[4].value.as < nezoku::TypeSpecifier > (), yystack_[3].value.as < std::string > (), yystack_[1].value.as < nezoku::Expression* > ()); }
-#line 955 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 956 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 8: // type_specifier: INT_8_T
-#line 246 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 247 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
               { yylhs.value.as < nezoku::TypeSpecifier > () = nezoku::TypeSpecifier::I8Type; }
-#line 961 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 962 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 9: // type_specifier: INT_16_T
-#line 247 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 248 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                { yylhs.value.as < nezoku::TypeSpecifier > () = nezoku::TypeSpecifier::I16Type; }
-#line 967 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 968 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 10: // type_specifier: INT_32_T
-#line 248 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 249 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                { yylhs.value.as < nezoku::TypeSpecifier > () = nezoku::TypeSpecifier::I32Type; }
-#line 973 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 974 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 11: // type_specifier: INT_64_T
-#line 249 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 250 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                { yylhs.value.as < nezoku::TypeSpecifier > () = nezoku::TypeSpecifier::I64Type; }
-#line 979 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 980 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 12: // type_specifier: UINT_8_T
-#line 250 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 251 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                { yylhs.value.as < nezoku::TypeSpecifier > () = nezoku::TypeSpecifier::U8Type; }
-#line 985 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 986 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 13: // type_specifier: UINT_16_T
-#line 251 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 252 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                 { yylhs.value.as < nezoku::TypeSpecifier > () = nezoku::TypeSpecifier::U16Type; }
-#line 991 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 992 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 14: // type_specifier: UINT_32_T
-#line 252 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 253 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                 { yylhs.value.as < nezoku::TypeSpecifier > () = nezoku::TypeSpecifier::U32Type; }
-#line 997 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 998 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 15: // type_specifier: UINT_64_T
-#line 253 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 254 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                 { yylhs.value.as < nezoku::TypeSpecifier > () = nezoku::TypeSpecifier::U64Type; }
-#line 1003 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1004 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 16: // type_specifier: BOOL_T
-#line 254 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 255 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
              { yylhs.value.as < nezoku::TypeSpecifier > () = nezoku::TypeSpecifier::BoolType; }
-#line 1009 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1010 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 17: // type_specifier: CHAR_T
-#line 255 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 256 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
              { yylhs.value.as < nezoku::TypeSpecifier > () = nezoku::TypeSpecifier::CharType; }
-#line 1015 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1016 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 18: // type_specifier: FLOAT_32_T
-#line 256 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 257 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                  { yylhs.value.as < nezoku::TypeSpecifier > () = nezoku::TypeSpecifier::F32Type; }
-#line 1021 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1022 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 19: // type_specifier: FLOAT_64_T
-#line 257 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 258 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                  { yylhs.value.as < nezoku::TypeSpecifier > () = nezoku::TypeSpecifier::F64Type; }
-#line 1027 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1028 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 20: // function_definition: type_specifier IDENTIFIER LPAREN parameter_list RPAREN statement
-#line 261 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 262 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                                                        {
 		yylhs.value.as < nezoku::FunctionDefinition* > () = new nezoku::FunctionDefinition(yystack_[5].value.as < nezoku::TypeSpecifier > (), yystack_[4].value.as < std::string > (), std::move(yystack_[2].value.as < std::vector<std::pair<nezoku::TypeSpecifier, std::string>> > ()), yystack_[0].value.as < nezoku::Statement* > ());
 	}
-#line 1035 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1036 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 21: // parameter_list: %empty
-#line 267 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 268 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
              { yylhs.value.as < std::vector<std::pair<nezoku::TypeSpecifier, std::string>> > () = std::vector<std::pair<nezoku::TypeSpecifier, std::string>>(); }
-#line 1041 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1042 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 22: // parameter_list: type_specifier IDENTIFIER
-#line 268 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 269 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                 {
 		yylhs.value.as < std::vector<std::pair<nezoku::TypeSpecifier, std::string>> > () = std::vector<std::pair<nezoku::TypeSpecifier, std::string>>();
 		yylhs.value.as < std::vector<std::pair<nezoku::TypeSpecifier, std::string>> > ().push_back(std::make_pair(yystack_[1].value.as < nezoku::TypeSpecifier > (), yystack_[0].value.as < std::string > ()));
 	}
-#line 1050 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1051 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 23: // parameter_list: parameter_list COMA type_specifier IDENTIFIER
-#line 272 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 273 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                                     {
 		yystack_[3].value.as < std::vector<std::pair<nezoku::TypeSpecifier, std::string>> > ().push_back(std::make_pair(yystack_[1].value.as < nezoku::TypeSpecifier > (), yystack_[0].value.as < std::string > ()));
 		yylhs.value.as < std::vector<std::pair<nezoku::TypeSpecifier, std::string>> > () = yystack_[3].value.as < std::vector<std::pair<nezoku::TypeSpecifier, std::string>> > ();
 	}
-#line 1059 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1060 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 24: // compound_statement: LBRACKET RBRACKET
-#line 279 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 280 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                         { yylhs.value.as < nezoku::Statement* > () = new nezoku::CompoundStatement(); }
-#line 1065 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1066 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 25: // compound_statement: LBRACKET block_item_list RBRACKET
-#line 280 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 281 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                         { yylhs.value.as < nezoku::Statement* > () = new nezoku::CompoundStatement(std::move(yystack_[1].value.as < std::vector<std::variant<nezoku::Declaration*, nezoku::Statement*>> > ())); }
-#line 1071 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1072 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 26: // block_item_list: block_item
-#line 284 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 285 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                  {
 		yylhs.value.as < std::vector<std::variant<nezoku::Declaration*, nezoku::Statement*>> > () = std::vector<std::variant<nezoku::Declaration*, nezoku::Statement*>>();
 		yylhs.value.as < std::vector<std::variant<nezoku::Declaration*, nezoku::Statement*>> > ().push_back(yystack_[0].value.as < std::variant<nezoku::Declaration*, nezoku::Statement*> > ());
 	}
-#line 1080 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1081 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 27: // block_item_list: block_item_list block_item
-#line 288 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 289 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                  {
 		yystack_[1].value.as < std::vector<std::variant<nezoku::Declaration*, nezoku::Statement*>> > ().push_back(yystack_[0].value.as < std::variant<nezoku::Declaration*, nezoku::Statement*> > ());
 		yylhs.value.as < std::vector<std::variant<nezoku::Declaration*, nezoku::Statement*>> > () = yystack_[1].value.as < std::vector<std::variant<nezoku::Declaration*, nezoku::Statement*>> > ();
 	}
-#line 1089 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1090 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 28: // block_item: declaration
-#line 295 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 296 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                   { yylhs.value.as < std::variant<nezoku::Declaration*, nezoku::Statement*> > () = std::variant<nezoku::Declaration*, nezoku::Statement*>(yystack_[0].value.as < nezoku::Declaration* > ()); }
-#line 1095 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1096 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 29: // block_item: statement
-#line 296 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 297 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                 { yylhs.value.as < std::variant<nezoku::Declaration*, nezoku::Statement*> > () = std::variant<nezoku::Declaration*, nezoku::Statement*>(yystack_[0].value.as < nezoku::Statement* > ()); }
-#line 1101 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1102 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 30: // statement: compound_statement
-#line 300 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 301 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                          { yylhs.value.as < nezoku::Statement* > () = yystack_[0].value.as < nezoku::Statement* > (); }
-#line 1107 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1108 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 31: // statement: selection_statement
-#line 301 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 302 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                           { yylhs.value.as < nezoku::Statement* > () = yystack_[0].value.as < nezoku::Statement* > (); }
-#line 1113 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1114 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 32: // statement: iteration_statement
-#line 302 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 303 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                           { yylhs.value.as < nezoku::Statement* > () = yystack_[0].value.as < nezoku::Statement* > (); }
-#line 1119 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1120 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 33: // statement: expression_statement
-#line 303 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 304 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                            { yylhs.value.as < nezoku::Statement* > () = yystack_[0].value.as < nezoku::Statement* > (); }
-#line 1125 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1126 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 34: // statement: jump_statement
-#line 304 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 305 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                      { yylhs.value.as < nezoku::Statement* > () = yystack_[0].value.as < nezoku::Statement* > (); }
-#line 1131 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1132 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 35: // selection_statement: IF_KW LPAREN expression RPAREN statement
-#line 308 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 309 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                                             { yylhs.value.as < nezoku::Statement* > () = new nezoku::SelectionStatement(yystack_[2].value.as < nezoku::Expression* > (), yystack_[0].value.as < nezoku::Statement* > ()); }
-#line 1137 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1138 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 36: // selection_statement: IF_KW LPAREN expression RPAREN statement ELSE_KW statement
-#line 309 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 310 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                                                  { yylhs.value.as < nezoku::Statement* > () = new nezoku::SelectionStatement(yystack_[4].value.as < nezoku::Expression* > (), yystack_[2].value.as < nezoku::Statement* > (), yystack_[0].value.as < nezoku::Statement* > ()); }
-#line 1143 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1144 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 37: // iteration_statement: WHILE_KW LPAREN expression RPAREN statement
-#line 313 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 314 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                                   {
 		auto iteration_statement = new nezoku::IterationStatement();
 		iteration_statement->add_condition(yystack_[2].value.as < nezoku::Expression* > ());
 		iteration_statement->add_statement(yystack_[0].value.as < nezoku::Statement* > ());
 		yylhs.value.as < nezoku::Statement* > () = iteration_statement;
 	}
-#line 1154 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1155 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 38: // jump_statement: CONTINUE_KW SEMICOLON
-#line 350 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 351 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                             { yylhs.value.as < nezoku::Statement* > () = new nezoku::ContinueStatement(); }
-#line 1160 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1161 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 39: // jump_statement: BREAK_KW SEMICOLON
-#line 351 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 352 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                          { yylhs.value.as < nezoku::Statement* > () = new nezoku::BreakStatement(); }
-#line 1166 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1167 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 40: // jump_statement: RETURN_KW SEMICOLON
-#line 352 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 353 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                           { yylhs.value.as < nezoku::Statement* > () = new nezoku::ReturnStatement(); }
-#line 1172 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1173 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 41: // jump_statement: RETURN_KW expression SEMICOLON
-#line 353 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 354 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                      { yylhs.value.as < nezoku::Statement* > () = new nezoku::ReturnStatement(yystack_[1].value.as < nezoku::Expression* > ()); }
-#line 1178 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1179 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 42: // expression_statement: SEMICOLON
-#line 357 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 358 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                 { yylhs.value.as < nezoku::Statement* > () = new nezoku::ExpressionStatement(); }
-#line 1184 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1185 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 43: // expression_statement: expression SEMICOLON
-#line 358 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 359 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                            { yylhs.value.as < nezoku::Statement* > () = new nezoku::ExpressionStatement(yystack_[1].value.as < nezoku::Expression* > ()); }
-#line 1190 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1191 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 44: // expression: assignment_expression
-#line 362 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 363 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                 { yylhs.value.as < nezoku::Expression* > () = yystack_[0].value.as < nezoku::Expression* > (); }
-#line 1196 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1197 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 45: // assignment_expression: logical_or_expression
-#line 367 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 368 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                 { yylhs.value.as < nezoku::Expression* > () = yystack_[0].value.as < nezoku::Expression* > (); }
-#line 1202 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1203 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 46: // assignment_expression: primary_expression assignment_operator assignment_expression
-#line 368 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 369 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                                                        {
 		yylhs.value.as < nezoku::Expression* > () = new nezoku::AssignmentExpression(yystack_[2].value.as < nezoku::Expression* > (), yystack_[1].value.as < nezoku::AssignmentOperator > (), yystack_[0].value.as < nezoku::Expression* > ());
 	}
-#line 1210 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1211 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 47: // assignment_operator: ASSIGN
-#line 374 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 375 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                  { yylhs.value.as < nezoku::AssignmentOperator > () = nezoku::AssignmentOperator::Assign; }
-#line 1216 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1217 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 48: // assignment_operator: MUL_ASSIGN
-#line 375 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 376 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                      { yylhs.value.as < nezoku::AssignmentOperator > () = nezoku::AssignmentOperator::MulAssign; }
-#line 1222 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1223 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 49: // assignment_operator: DIV_ASSIGN
-#line 376 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 377 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                      { yylhs.value.as < nezoku::AssignmentOperator > () = nezoku::AssignmentOperator::DivAssign; }
-#line 1228 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1229 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 50: // assignment_operator: MOD_ASSIGN
-#line 377 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 378 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                      { yylhs.value.as < nezoku::AssignmentOperator > () = nezoku::AssignmentOperator::ModAssign; }
-#line 1234 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1235 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 51: // assignment_operator: ADD_ASSIGN
-#line 378 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 379 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                      { yylhs.value.as < nezoku::AssignmentOperator > () = nezoku::AssignmentOperator::AddAssign; }
-#line 1240 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1241 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 52: // assignment_operator: SUB_ASSIGN
-#line 379 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 380 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                      { yylhs.value.as < nezoku::AssignmentOperator > () = nezoku::AssignmentOperator::SubAssign; }
-#line 1246 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1247 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 53: // assignment_operator: SHL_ASSIGN
-#line 380 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 381 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                      { yylhs.value.as < nezoku::AssignmentOperator > () = nezoku::AssignmentOperator::ShlAssign; }
-#line 1252 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1253 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 54: // assignment_operator: SHR_ASSIGN
-#line 381 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 382 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                      { yylhs.value.as < nezoku::AssignmentOperator > () = nezoku::AssignmentOperator::ShrAssign; }
-#line 1258 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1259 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 55: // assignment_operator: AND_ASSIGN
-#line 382 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 383 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                      { yylhs.value.as < nezoku::AssignmentOperator > () = nezoku::AssignmentOperator::AndAssign; }
-#line 1264 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1265 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 56: // assignment_operator: XOR_ASSIGN
-#line 383 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 384 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                      { yylhs.value.as < nezoku::AssignmentOperator > () = nezoku::AssignmentOperator::XorAssign; }
-#line 1270 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1271 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 57: // assignment_operator: OR_ASSIGN
-#line 384 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 385 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                     { yylhs.value.as < nezoku::AssignmentOperator > () = nezoku::AssignmentOperator::OrAssign; }
-#line 1276 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1277 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 58: // logical_or_expression: logical_and_expression
-#line 388 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 389 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                  { yylhs.value.as < nezoku::Expression* > () = yystack_[0].value.as < nezoku::Expression* > (); }
-#line 1282 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1283 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 59: // logical_or_expression: logical_or_expression LOR logical_and_expression
-#line 389 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 390 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                                            { yylhs.value.as < nezoku::Expression* > () = new nezoku::LorExpression(yystack_[2].value.as < nezoku::Expression* > (), yystack_[0].value.as < nezoku::Expression* > ()); }
-#line 1288 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1289 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 60: // logical_and_expression: inclusive_or_expression
-#line 393 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 394 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                   { yylhs.value.as < nezoku::Expression* > () = yystack_[0].value.as < nezoku::Expression* > (); }
-#line 1294 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1295 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 61: // logical_and_expression: logical_and_expression LAND inclusive_or_expression
-#line 394 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 395 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                                               { yylhs.value.as < nezoku::Expression* > () = new nezoku::LandExpression(yystack_[2].value.as < nezoku::Expression* > (), yystack_[0].value.as < nezoku::Expression* > ()); }
-#line 1300 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1301 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 62: // inclusive_or_expression: exclusive_or_expression
-#line 398 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 399 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                   { yylhs.value.as < nezoku::Expression* > () = yystack_[0].value.as < nezoku::Expression* > (); }
-#line 1306 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1307 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 63: // inclusive_or_expression: inclusive_or_expression OR exclusive_or_expression
-#line 399 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 400 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                                              { yylhs.value.as < nezoku::Expression* > () = new nezoku::OrExpression(yystack_[2].value.as < nezoku::Expression* > (), yystack_[0].value.as < nezoku::Expression* > ()); }
-#line 1312 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1313 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 64: // exclusive_or_expression: and_expression
-#line 403 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 404 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                          { yylhs.value.as < nezoku::Expression* > () = yystack_[0].value.as < nezoku::Expression* > (); }
-#line 1318 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1319 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 65: // exclusive_or_expression: exclusive_or_expression XOR and_expression
-#line 404 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 405 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                                      { yylhs.value.as < nezoku::Expression* > () = new nezoku::XorExpression(yystack_[2].value.as < nezoku::Expression* > (), yystack_[0].value.as < nezoku::Expression* > ()); }
-#line 1324 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1325 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 66: // and_expression: equality_expression
-#line 408 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 409 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                               { yylhs.value.as < nezoku::Expression* > () = yystack_[0].value.as < nezoku::Expression* > (); }
-#line 1330 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1331 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 67: // and_expression: and_expression AND equality_expression
-#line 409 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 410 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                                  { yylhs.value.as < nezoku::Expression* > () = new nezoku::AndExpression(yystack_[2].value.as < nezoku::Expression* > (), yystack_[0].value.as < nezoku::Expression* > ()); }
-#line 1336 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1337 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 68: // equality_expression: relational_expression
-#line 413 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 414 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                 { yylhs.value.as < nezoku::Expression* > () = yystack_[0].value.as < nezoku::Expression* > (); }
-#line 1342 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1343 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 69: // equality_expression: equality_expression EQ relational_expression
-#line 414 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 415 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                                        { yylhs.value.as < nezoku::Expression* > () = new nezoku::EqExpression(yystack_[2].value.as < nezoku::Expression* > (), yystack_[0].value.as < nezoku::Expression* > ()); }
-#line 1348 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1349 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 70: // equality_expression: equality_expression NEQ relational_expression
-#line 415 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 416 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                                         { yylhs.value.as < nezoku::Expression* > () = new nezoku::NeqExpression(yystack_[2].value.as < nezoku::Expression* > (), yystack_[0].value.as < nezoku::Expression* > ()); }
-#line 1354 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1355 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 71: // relational_expression: shift_expression
-#line 419 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 420 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                            { yylhs.value.as < nezoku::Expression* > () = yystack_[0].value.as < nezoku::Expression* > (); }
-#line 1360 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1361 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 72: // relational_expression: relational_expression LESS shift_expression
-#line 420 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 421 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                                       { yylhs.value.as < nezoku::Expression* > () = new nezoku::LessExpression(yystack_[2].value.as < nezoku::Expression* > (), yystack_[0].value.as < nezoku::Expression* > ()); }
-#line 1366 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1367 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 73: // relational_expression: relational_expression GREATER shift_expression
-#line 421 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 422 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                                          { yylhs.value.as < nezoku::Expression* > () = new nezoku::GreaterExpression(yystack_[2].value.as < nezoku::Expression* > (), yystack_[0].value.as < nezoku::Expression* > ()); }
-#line 1372 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1373 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 74: // relational_expression: relational_expression LEQ shift_expression
-#line 422 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 423 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                                      { yylhs.value.as < nezoku::Expression* > () = new nezoku::LeqExpression(yystack_[2].value.as < nezoku::Expression* > (), yystack_[0].value.as < nezoku::Expression* > ()); }
-#line 1378 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1379 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 75: // relational_expression: relational_expression GEQ shift_expression
-#line 423 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 424 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                                      { yylhs.value.as < nezoku::Expression* > () = new nezoku::GeqExpression(yystack_[2].value.as < nezoku::Expression* > (), yystack_[0].value.as < nezoku::Expression* > ()); }
-#line 1384 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1385 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 76: // shift_expression: additive_expression
-#line 427 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 428 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                               { yylhs.value.as < nezoku::Expression* > () = yystack_[0].value.as < nezoku::Expression* > (); }
-#line 1390 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1391 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 77: // shift_expression: shift_expression SHL additive_expression
-#line 428 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 429 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                                    { yylhs.value.as < nezoku::Expression* > () = new nezoku::ShlExpression(yystack_[2].value.as < nezoku::Expression* > (), yystack_[0].value.as < nezoku::Expression* > ()); }
-#line 1396 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1397 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 78: // shift_expression: shift_expression SHR additive_expression
-#line 429 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 430 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                                    { yylhs.value.as < nezoku::Expression* > () = new nezoku::ShrExpression(yystack_[2].value.as < nezoku::Expression* > (), yystack_[0].value.as < nezoku::Expression* > ()); }
-#line 1402 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1403 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 79: // additive_expression: multiplicative_expression
-#line 433 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 434 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                     { yylhs.value.as < nezoku::Expression* > () = yystack_[0].value.as < nezoku::Expression* > (); }
-#line 1408 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1409 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 80: // additive_expression: additive_expression ADD multiplicative_expression
-#line 434 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 435 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                                             { yylhs.value.as < nezoku::Expression* > () = new nezoku::AddExpression(yystack_[2].value.as < nezoku::Expression* > (), yystack_[0].value.as < nezoku::Expression* > ()); }
-#line 1414 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1415 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 81: // additive_expression: additive_expression SUB multiplicative_expression
-#line 435 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 436 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                                             { yylhs.value.as < nezoku::Expression* > () = new nezoku::SubExpression(yystack_[2].value.as < nezoku::Expression* > (), yystack_[0].value.as < nezoku::Expression* > ()); }
-#line 1420 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1421 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 82: // multiplicative_expression: primary_expression
-#line 439 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 440 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                          { yylhs.value.as < nezoku::Expression* > () = yystack_[0].value.as < nezoku::Expression* > (); }
-#line 1426 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1427 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 83: // multiplicative_expression: multiplicative_expression MUL primary_expression
-#line 440 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 441 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                                            { yylhs.value.as < nezoku::Expression* > () = new nezoku::MulExpression(yystack_[2].value.as < nezoku::Expression* > (), yystack_[0].value.as < nezoku::Expression* > ()); }
-#line 1432 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1433 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 84: // multiplicative_expression: multiplicative_expression DIV primary_expression
-#line 441 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 442 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                                            { yylhs.value.as < nezoku::Expression* > () = new nezoku::DivExpression(yystack_[2].value.as < nezoku::Expression* > (), yystack_[0].value.as < nezoku::Expression* > ()); }
-#line 1438 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1439 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 85: // multiplicative_expression: multiplicative_expression MOD primary_expression
-#line 442 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 443 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                                            { yylhs.value.as < nezoku::Expression* > () = new nezoku::ModExpression(yystack_[2].value.as < nezoku::Expression* > (), yystack_[0].value.as < nezoku::Expression* > ()); }
-#line 1444 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1445 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 86: // primary_expression: IDENTIFIER
-#line 446 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 447 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                  { yylhs.value.as < nezoku::Expression* > () = new nezoku::IdentifierExpression(yystack_[0].value.as < std::string > ()); }
-#line 1450 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1451 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 87: // primary_expression: CONSTANT
-#line 447 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 448 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                { yylhs.value.as < nezoku::Expression* > () = new nezoku::ConstantExpression(yystack_[0].value.as < std::string > ()); }
-#line 1456 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1457 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 88: // primary_expression: STRING_LITERAL
-#line 448 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 449 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                          { yylhs.value.as < nezoku::Expression* > () = new nezoku::StringExpression(yystack_[0].value.as < std::string > ()); }
-#line 1462 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1463 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
   case 89: // primary_expression: LPAREN expression RPAREN
-#line 449 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 450 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
                                    { yylhs.value.as < nezoku::Expression* > () = yystack_[1].value.as < nezoku::Expression* > (); }
-#line 1468 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1469 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;
 
 
-#line 1472 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 1473 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
 
             default:
               break;
@@ -2016,15 +2017,15 @@ namespace yy {
   const short
   parser::yyrline_[] =
   {
-       0,   224,   224,   229,   236,   237,   241,   242,   246,   247,
-     248,   249,   250,   251,   252,   253,   254,   255,   256,   257,
-     261,   267,   268,   272,   279,   280,   284,   288,   295,   296,
-     300,   301,   302,   303,   304,   308,   309,   313,   350,   351,
-     352,   353,   357,   358,   362,   367,   368,   374,   375,   376,
-     377,   378,   379,   380,   381,   382,   383,   384,   388,   389,
-     393,   394,   398,   399,   403,   404,   408,   409,   413,   414,
-     415,   419,   420,   421,   422,   423,   427,   428,   429,   433,
-     434,   435,   439,   440,   441,   442,   446,   447,   448,   449
+       0,   224,   224,   230,   237,   238,   242,   243,   247,   248,
+     249,   250,   251,   252,   253,   254,   255,   256,   257,   258,
+     262,   268,   269,   273,   280,   281,   285,   289,   296,   297,
+     301,   302,   303,   304,   305,   309,   310,   314,   351,   352,
+     353,   354,   358,   359,   363,   368,   369,   375,   376,   377,
+     378,   379,   380,   381,   382,   383,   384,   385,   389,   390,
+     394,   395,   399,   400,   404,   405,   409,   410,   414,   415,
+     416,   420,   421,   422,   423,   424,   428,   429,   430,   434,
+     435,   436,   440,   441,   442,   443,   447,   448,   449,   450
   };
 
   void
@@ -2056,9 +2057,9 @@ namespace yy {
 
 
 } // yy
-#line 2060 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
+#line 2061 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
 
-#line 452 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
+#line 453 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.y"
 
 
 void yy::parser::error(const location_type& location, const std::string& message) {

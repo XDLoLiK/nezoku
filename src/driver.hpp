@@ -33,14 +33,14 @@ public:
     void interpret(const std::string& filename);
 
 private:
-    yy::location location_;
-    TranslationUnit* translation_unit_;
     bool trace_scanning_{false};
     bool trace_parsing_{false};
     std::string file_{};
-    std::ifstream stream_;
+    std::ifstream stream_{};
     Scanner scanner_;
     yy::parser parser_;
+    yy::location location_{};
+    TranslationUnit* translation_unit_{nullptr};
 };
 
 } // namespace nezoku

@@ -224,6 +224,7 @@ translation_unit
     : external_declaration {
 		$$ = new nezoku::TranslationUnit();
 		$$->add_external_declaration(std::move($1));
+		// TODO: Support multiple translation units.
 		driver.translation_unit($$);
 	};
     | translation_unit external_declaration {
