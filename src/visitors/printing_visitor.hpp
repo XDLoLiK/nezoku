@@ -12,7 +12,7 @@ namespace nezoku {
 class PrintingVisitor final: public Visitor {
 public:
     PrintingVisitor(const std::string& file);
-    ~PrintingVisitor();
+    ~PrintingVisitor() override;
 
     void visit(TranslationUnit* translation_unit) override;
     void visit(FunctionDefinition* function_definition) override;

@@ -916,7 +916,7 @@ namespace yy {
                            {
 		yylhs.value.as < nezoku::TranslationUnit* > () = new nezoku::TranslationUnit();
 		yylhs.value.as < nezoku::TranslationUnit* > ()->add_external_declaration(std::move(yystack_[0].value.as < std::variant<nezoku::Declaration*, nezoku::FunctionDefinition*> > ()));
-		driver.program = yylhs.value.as < nezoku::TranslationUnit* > ();
+		driver.translation_unit(yylhs.value.as < nezoku::TranslationUnit* > ());
 	}
 #line 922 "/home/stanislav/Mipt/compilers-course/nezoku/src/parser.cpp"
     break;

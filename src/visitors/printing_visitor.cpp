@@ -41,15 +41,12 @@
 #include "ast/type_specifier.hpp"
 #include "ast/assignment_operator.hpp"
 
-#include <ostream>
-#include <iostream>
-
 namespace nezoku {
 
 template<class... Ts> struct VariantVisitor: Ts... { using Ts::operator()...; };
 template<class... Ts> VariantVisitor(Ts...) -> VariantVisitor<Ts...>;
 
-std::string type_specifier_str(const TypeSpecifier& type) {
+static std::string type_specifier_str(const TypeSpecifier& type) {
     switch (type) {
         case TypeSpecifier::VoidType: return "void";
         case TypeSpecifier::I8Type: return "i8";
@@ -68,7 +65,7 @@ std::string type_specifier_str(const TypeSpecifier& type) {
     }
 }
 
-std::string assignment_operator_str(const AssignmentOperator& op) {
+static std::string assignment_operator_str(const AssignmentOperator& op) {
     switch (op) {
         case AssignmentOperator::Assign: return "=";
         case AssignmentOperator::AddAssign: return "+=";

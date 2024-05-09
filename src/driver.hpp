@@ -13,31 +13,34 @@
 namespace nezoku {
 
 class Driver {
-    friend class Scanner;
-
 public:
     Driver();
     ~Driver();
     
     int parse(const std::string& file_name);
-    void print_tree(const std::string& filename);
+    
+    void trace_scanning(bool flag);
+    void trace_parsing(bool flag);
+    void translation_unit(TranslationUnit* translation_unit);
+    [[nodiscard]]
+    auto location() noexcept -> yy::location&;
 
     void scan_begin();
     void scan_end();
 
-public:
-    bool trace_scanning{false};
-    bool trace_parsing{false};
-    int result;
-
-    yy::location location;
-    std::string file;
-    Scanner scanner;
-    yy::parser parser;
-    TranslationUnit* program;
+    void print_tree(const std::string& filename);
+    void compile(const std::string& filename);
+    void interpret(const std::string& filename);
 
 private:
-    std::ifstream stream;
+    yy::location location_;
+    TranslationUnit* translation_unit_;
+    bool trace_scanning_{false};
+    bool trace_parsing_{false};
+    std::string file_{};
+    std::ifstream stream_;
+    Scanner scanner_;
+    yy::parser parser_;
 };
 
 } // namespace nezoku

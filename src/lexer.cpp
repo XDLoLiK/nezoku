@@ -857,7 +857,7 @@ YY_DECL
 
 #line 41 "/home/stanislav/Mipt/compilers-course/nezoku/src/scanner.l"
     // Code run every time yylex is invoked.
-    yy::location& loc = driver.location;
+    auto loc = driver.location();
     loc.step();
 
 

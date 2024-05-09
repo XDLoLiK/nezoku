@@ -38,7 +38,7 @@ ES (\\(['"\?\\abfnrtv]|x{HX}+))
 
 %{
     // Code run every time yylex is invoked.
-    yy::location& loc = driver.location;
+    auto loc = driver.location();
     loc.step();
 %}
 

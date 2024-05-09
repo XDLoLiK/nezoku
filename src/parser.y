@@ -224,7 +224,7 @@ translation_unit
     : external_declaration {
 		$$ = new nezoku::TranslationUnit();
 		$$->add_external_declaration(std::move($1));
-		driver.program = $$;
+		driver.translation_unit($$);
 	};
     | translation_unit external_declaration {
 		$1->add_external_declaration(std::move($2));
