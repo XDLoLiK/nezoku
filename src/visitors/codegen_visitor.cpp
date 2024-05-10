@@ -4,7 +4,6 @@
 #include "ast/function_definition.hpp"
 #include "ast/declaration.hpp"
 
-#include "ast/statement.hpp"
 #include "ast/compound_statement.hpp"
 #include "ast/return_statement.hpp"
 #include "ast/expression_statement.hpp"
@@ -13,7 +12,6 @@
 #include "ast/selection_statement.hpp"
 #include "ast/iteration_statement.hpp"
 
-#include "ast/expression.hpp"
 #include "ast/comma_expression.hpp"
 #include "ast/assignment_expression.hpp"
 #include "ast/logical_or_expression.hpp"
@@ -52,16 +50,21 @@ static T parse_constant(const std::string& constant) {
     return;
 }
 
-CodegenVisitor::CodegenVisitor(const std::string& file)
-    : stream_(file)
-    , builder_(context_)
-    , module_(std::make_unique<llvm::Module>(file, context_)) {
+CodegenVisitor::CodegenVisitor(const std::string& mod_name)
+    : builder_(context_)
+    , module_(std::make_unique<llvm::Module>(mod_name, context_)) {
     // TODO: Implement.
     return;
 }
 
-CodegenVisitor::~CodegenVisitor() {
-    stream_.close();
+std::error_code CodegenVisitor::write_to(const std::string& file_name) {
+    llvm::StringRef file_ref(file_name);
+    std::error_code err;
+    llvm::raw_fd_ostream out_file(file_ref, err);
+    module_->print(out_file, nullptr);
+    out_file.flush();
+    out_file.close();
+    return err;
 }
 
 void CodegenVisitor::visit(TranslationUnit* translation_unit) {
@@ -122,23 +125,74 @@ void CodegenVisitor::visit(ReturnStatement* return_statement) {
 }
 
 void CodegenVisitor::visit([[maybe_unused]] ContinueStatement* continue_statement) {
-    // TODO: Implement.
-    return;
+    if (cond_block_) {
+        builder_.CreateBr(cond_block_);
+    } else {
+        // TODO: Throw error.
+    }
 }
 
 void CodegenVisitor::visit([[maybe_unused]] BreakStatement* break_statement) {
-    // TODO: Implement.
-    return;
+    if (out_block_) {
+        builder_.CreateBr(out_block_);
+    } else {
+        // TODO: Throw error.
+    }
 }
 
 void CodegenVisitor::visit(SelectionStatement* selection_statement) {
-    // TODO: Implement.
-    return;
+    auto then_block = generate_block();
+    llvm::BasicBlock* else_block = nullptr;
+    auto out_block = generate_block();
+
+    auto condition = selection_statement->if_expression();
+    condition->accept_visitor(this);
+    auto condition_value = latest_values_.top();
+    latest_values_.pop();
+
+    auto else_body = selection_statement->else_statement();
+
+    if (else_body) {
+        else_block = generate_block();
+        builder_.CreateCondBr(condition_value, then_block, else_block);
+    } else {
+        builder_.CreateCondBr(condition_value, then_block, out_block);
+    }
+
+    builder_.SetInsertPoint(then_block);
+    auto if_body = selection_statement->then_statement();
+    if_body->accept_visitor(this);
+    builder_.CreateBr(out_block);
+
+    if (else_body) {
+        builder_.SetInsertPoint(else_block);
+        else_body->accept_visitor(this);
+        builder_.CreateBr(out_block);
+    }
+
+    builder_.SetInsertPoint(out_block);
 }
 
 void CodegenVisitor::visit([[maybe_unused]] IterationStatement* iteration_statement) {
-    // TODO: Implement.
-    return;
+    cond_block_ = generate_block();
+    auto iter_block = generate_block();
+    out_block_ = generate_block();
+
+    builder_.SetInsertPoint(cond_block_);
+    auto condition = iteration_statement->condition();
+    condition->accept_visitor(this);
+    auto condition_value = latest_values_.top();
+    latest_values_.pop();
+    builder_.CreateCondBr(condition_value, iter_block, out_block_);
+
+    builder_.SetInsertPoint(iter_block);
+    auto body = iteration_statement->body();
+    body->accept_visitor(this);
+    builder_.CreateBr(cond_block_);
+    
+    builder_.SetInsertPoint(out_block_);
+    cond_block_ = nullptr;
+    out_block_ = nullptr;
 }
 
 void CodegenVisitor::visit(AssignmentExpression* assignment_expression) {
@@ -183,42 +237,42 @@ void CodegenVisitor::visit(AndExpression* and_expression) {
 
 void CodegenVisitor::visit(EqExpression* eq_expression) {
     auto call = [this](llvm::Value* lhs, llvm::Value* rhs) -> llvm::Value* {
-        return builder_.CreateLogicalOr(lhs, rhs);
+        return builder_.CreateICmpEQ(lhs, rhs);
     };
     visit_binary_op(eq_expression, call);
 }
 
 void CodegenVisitor::visit(NeqExpression* neq_expression) {
     auto call = [this](llvm::Value* lhs, llvm::Value* rhs) -> llvm::Value* {
-        return builder_.CreateLogicalOr(lhs, rhs);
+        return builder_.CreateICmpNE(lhs, rhs);
     };
     visit_binary_op(neq_expression, call);
 }
 
 void CodegenVisitor::visit(LessExpression* less_expression) {
     auto call = [this](llvm::Value* lhs, llvm::Value* rhs) -> llvm::Value* {
-        return builder_.CreateLogicalOr(lhs, rhs);
+        return builder_.CreateICmpSLT(lhs, rhs);
     };
     visit_binary_op(less_expression, call);
 }
 
 void CodegenVisitor::visit(GreaterExpression* greater_expression) {
     auto call = [this](llvm::Value* lhs, llvm::Value* rhs) -> llvm::Value* {
-        return builder_.CreateLogicalOr(lhs, rhs);
+        return builder_.CreateICmpSGT(lhs, rhs);
     };
     visit_binary_op(greater_expression, call);
 }
 
 void CodegenVisitor::visit(LeqExpression* leq_expression) {
     auto call = [this](llvm::Value* lhs, llvm::Value* rhs) -> llvm::Value* {
-        return builder_.CreateLogicalOr(lhs, rhs);
+        return builder_.CreateICmpSLE(lhs, rhs);
     };
     visit_binary_op(leq_expression, call);
 }
 
 void CodegenVisitor::visit(GeqExpression* geq_expression) {
     auto call = [this](llvm::Value* lhs, llvm::Value* rhs) -> llvm::Value* {
-        return builder_.CreateLogicalOr(lhs, rhs);
+        return builder_.CreateICmpSGE(lhs, rhs);
     };
     visit_binary_op(geq_expression, call);
 }
@@ -232,7 +286,7 @@ void CodegenVisitor::visit(ShlExpression* shl_expression) {
 
 void CodegenVisitor::visit(ShrExpression* shr_expression) {
     auto call = [this](llvm::Value* lhs, llvm::Value* rhs) -> llvm::Value* {
-        return builder_.CreateShr(lhs, rhs);
+        return builder_.CreateLShr(lhs, rhs);
     };
     visit_binary_op(shr_expression, call);
 }
@@ -267,7 +321,7 @@ void CodegenVisitor::visit(DivExpression* div_expression) {
 
 void CodegenVisitor::visit(ModExpression* mod_expression) {
     auto call = [this](llvm::Value* lhs, llvm::Value* rhs) -> llvm::Value* {
-        return builder_.CreateMod(lhs, rhs);
+        return builder_.CreateSRem(lhs, rhs);
     };
     visit_binary_op(mod_expression, call);
 }
@@ -283,24 +337,28 @@ void CodegenVisitor::visit(ConstantExpression* constant_expression) {
 }
 
 void CodegenVisitor::visit(StringExpression* string_expression) {
-    // TODO: Implement.
-    return;
+    auto value = builder_.CreateGlobalStringPtr(string_expression->string());
+    latest_values_.push(value);
 }
 
 template<class T>
-void CodegenVisitor::visit_binary_op(T* binary_op, std::function<llvm::Value* (llvm::Value*, llvm::Value*)> op_func) {
-    auto left_expr = binary_op->left_expression();
-    left_expr->accept_visitor(this);
-    auto left_value = latest_values_.top();
-    latest_values_.pop();
+void CodegenVisitor::visit_binary_op(T* binary_op, BinaryOp op_func) {
+    auto visit_expr = [this](Expression* expr) -> llvm::Value* {
+        expr->accept_visitor(this);
+        auto value = latest_values_.top();
+        latest_values_.pop();
+        return value;
+    };
 
-    auto right_expr = binary_op->right_expression();
-    right_expr->accept_visitor(this);
-    auto right_value = latest_values_.top();
-    latest_values_.pop();
-
+    auto left_value = visit_expr(binary_op->left_expression());
+    auto right_value = visit_expr(binary_op->right_expression());
     auto new_value = op_func(left_value, right_value);
     latest_values_.push(new_value);
+}
+
+llvm::BasicBlock* CodegenVisitor::generate_block() {
+    auto id = std::to_string(blocks_++);
+    return llvm::BasicBlock::Create(context_, "Block" + id, current_function_);
 }
 
 }; // namespace nezoku

@@ -452,7 +452,7 @@ primary_expression
 	/* | IDENTIFIER LPAREN argument_expression_list RPAREN { $$ = new nezoku::FunctionCallExpression($1, $3); }; */
     ;
 
-/*
+	/*
 	argument_expression_list
 	: expression {
 		$$ = std::vector<nezoku::Expression*>();
@@ -463,7 +463,7 @@ primary_expression
 		$$ = $1;
 	};
 	;
-*/
+	*/
 
 %%
 

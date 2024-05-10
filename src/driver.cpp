@@ -65,6 +65,7 @@ void Driver::print_tree(const std::string& file_name) {
 void Driver::compile(const std::string& file_name) {
     auto visitor = CodegenVisitor(file_name);
     visitor.visit(translation_unit_);
+    visitor.write_to(file_name);
 }
 
 }; // namespace nezoku

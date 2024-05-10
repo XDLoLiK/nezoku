@@ -17,9 +17,13 @@
 namespace nezoku {
 
 class CodegenVisitor final: public Visitor {
+    using BinaryOp = std::function<llvm::Value* (llvm::Value*, llvm::Value*)>;
+
 public:
     CodegenVisitor(const std::string& file);
-    ~CodegenVisitor() override;
+    virtual ~CodegenVisitor() = default;
+
+    std::error_code write_to(const std::string& file_name);
 
     void visit(TranslationUnit* translation_unit) override;
     void visit(FunctionDefinition* function_definition) override;
@@ -58,16 +62,18 @@ public:
 
 private:
     template<class T>
-    void visit_binary_op(T* binary_op, std::function<llvm::Value* (llvm::Value*, llvm::Value*)> op_func);
+    void visit_binary_op(T* binary_op, BinaryOp op_func);
+
+    llvm::BasicBlock* generate_block();
 
 private:
-    size_t tabs_{0};
-    std::ofstream stream_;
+    size_t blocks_{0};
     llvm::LLVMContext context_{};
     llvm::IRBuilder<> builder_;
     std::unique_ptr<llvm::Module> module_;
-    FunctionDefinition* current_function_{nullptr};
-    llvm::BasicBlock* current_block_{nullptr};
+    llvm::Function* current_function_{nullptr};
+    llvm::BasicBlock* cond_block_{nullptr};
+    llvm::BasicBlock* out_block_{nullptr};
     std::stack<llvm::Value*> latest_values_;
 };
 

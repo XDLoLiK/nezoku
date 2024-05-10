@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.27)
 
-project(Nezoku LANGUAGES CXX)
+project(Nezoku LANGUAGES C CXX)
 
 find_package(FLEX 2.6 REQUIRED)
 find_package(BISON 3.0 REQUIRED)
