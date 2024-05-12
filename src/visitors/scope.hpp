@@ -12,33 +12,93 @@
 
 namespace nezoku {
 
+template<class F, class V>
 class Scope {
 public:
-    Scope(std::shared_ptr<Scope> parent_scope = nullptr);
-    Scope(const std::string& scope_name, std::shared_ptr<Scope> parent_scope = nullptr);
+    Scope(std::shared_ptr<Scope<F, V>> parent_scope = nullptr)
+        : parent_(parent_scope) {
+        name_ = "unnamed" + std::to_string(unnamed_count_++);
+    }
+    
+    Scope(const std::string& scope_name, std::shared_ptr<Scope<F, V>> parent_scope = nullptr)
+        : name_(scope_name)
+        , parent_(parent_scope) {}
 
     [[nodiscard]]
-    auto parent() const noexcept -> std::shared_ptr<Scope>;
+    auto parent() const noexcept -> std::shared_ptr<Scope<F, V>> {
+        return parent_;
+    }
 
-    void add_child(std::shared_ptr<Scope> child_scope);
-    void add_variable(const std::string& name, llvm::Value* variable);
-    void add_function(const std::string& name, llvm::Function* function);
+    void add_child(std::shared_ptr<Scope<F, V>> child_scope) {
+        children_.push_back(child_scope);
+    }
 
-    llvm::Value* get_variable(const std::string& name);
-    llvm::Function* get_function(const std::string& name);
+    void add_variable(const std::string& name, V* variable) {
+        variables_.insert(std::make_pair(name, variable));
+    }
+
+    void add_function(const std::string& name, F* function) {
+        functions_.insert(std::make_pair(name, function));
+    }
+
+    V* get_variable(const std::string& name) {
+        auto found = variables_.find(name);
+
+        if (found != variables_.end()) {
+            return found->second;
+        } else {
+            return nullptr;
+        }
+    }
+
+    F* get_function(const std::string& name) {
+        auto found = functions_.find(name);
+
+        if (found != functions_.end()) {
+            return found->second;
+        } else {
+            return nullptr;
+        }
+    }
 
 private:
-    static size_t UNNAMED_COUNT;
-
+    size_t unnamed_count_{0};
     std::string name_;
-    std::shared_ptr<Scope> parent_;
-    std::unordered_map<std::string, llvm::Value*> variables_;
-    std::unordered_map<std::string, llvm::Function*> functions_;
-    std::vector<std::shared_ptr<Scope>> children_;
+    std::shared_ptr<Scope<F, V>> parent_;
+    std::unordered_map<std::string, V*> variables_;
+    std::unordered_map<std::string, F*> functions_;
+    std::vector<std::shared_ptr<Scope<F, V>>> children_;
 };
 
-llvm::Value* scope_find_variable(const std::string& name, std::shared_ptr<Scope> scope);
-llvm::Function* scope_find_function(const std::string& name, std::shared_ptr<Scope> scope);
+template<class F, class V>
+static V* scope_find_variable(const std::string& name, std::shared_ptr<Scope<F, V>> scope) {
+    if (!scope) {
+        return nullptr;
+    }
+
+    auto found = scope->get_variable(name);
+
+    if (found) {
+        return found;
+    } else {
+        return scope_find_variable(name, scope->parent());
+    }
+}
+
+template<class F, class V>
+static F* scope_find_function(const std::string& name, std::shared_ptr<Scope<F, V>> scope) {
+    if (!scope) {
+        return nullptr;
+    }
+
+    auto found = scope->get_function(name);
+
+    if (found) {
+        return found;
+    } else {
+        return scope_find_function(name, scope->parent());
+    }
+}
 
 }; // namespace nezoku
 

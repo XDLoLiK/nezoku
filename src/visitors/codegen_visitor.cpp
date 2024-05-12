@@ -47,7 +47,7 @@ template<class... Ts> VariantVisitor(Ts...) -> VariantVisitor<Ts...>;
 CodegenVisitor::CodegenVisitor(const std::string& mod_name)
     : builder_(context_)
     , module_(std::make_unique<llvm::Module>(mod_name, context_)) {
-    current_scope_ = std::make_shared<Scope>("global");
+    current_scope_ = std::make_shared<Scope<llvm::Function, llvm::Value>>("global");
     get_printf();
     get_scanf();
 }
@@ -121,7 +121,7 @@ void CodegenVisitor::visit(Declaration* declaration) {
 void CodegenVisitor::visit(FunctionDefinition* function_definition) {
     auto func_name = function_definition->function_name();
     // Create a new scope for each function.
-    current_scope_ = std::make_shared<Scope>(func_name, current_scope_);
+    current_scope_ = std::make_shared<Scope<llvm::Function, llvm::Value>>(func_name, current_scope_);
 
     [[maybe_unused]] auto ret_type = function_definition->return_type();
     std::vector<llvm::Type*> arg_types;
@@ -168,7 +168,7 @@ void CodegenVisitor::visit(FunctionDefinition* function_definition) {
 
 void CodegenVisitor::visit(CompoundStatement* compound_statement) {
     // Create a new scope for each compound statement.
-    current_scope_ = std::make_shared<Scope>(current_scope_);
+    current_scope_ = std::make_shared<Scope<llvm::Function, llvm::Value>>(current_scope_);
 
     for (const auto& block_item: compound_statement->block_item_list()) {
         std::visit(
@@ -467,7 +467,7 @@ void CodegenVisitor::visit(StringExpression* string_expression) {
 //     }
 
 //     auto func_type = found_func->getFunctionType();
-//     auto func_callee = module_->getOrInsertFunction(name, func_type);
+//     auto func_callee = module_-  >getOrInsertFunction(name, func_type);
 //     builder_.CreateCall(func_callee, args);
 // }
 

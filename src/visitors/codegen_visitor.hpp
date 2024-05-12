@@ -85,7 +85,7 @@ private:
     llvm::BasicBlock* cond_block_{nullptr};
     llvm::BasicBlock* out_block_{nullptr};
     std::stack<llvm::Value*> latest_values_;
-    std::shared_ptr<Scope> current_scope_;
+    std::shared_ptr<Scope<llvm::Function, llvm::Value>> current_scope_;
 };
 
 }; // namespace nezoku
