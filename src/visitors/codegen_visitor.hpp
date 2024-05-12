@@ -1,6 +1,7 @@
 #ifndef CODEGEN_VISITOR_HPP
 #define CODEGEN_VISITOR_HPP
 
+#include <iostream>
 #include <memory>
 #include <fstream>
 #include <functional>
@@ -67,13 +68,16 @@ public:
     void visit(StringExpression* string_expression) override;
 
 private:
+    llvm::FunctionCallee get_printf();
+    llvm::FunctionCallee get_scanf();
+
     template<class T>
     void visit_binary_op(T* binary_op, BinaryOp op_func);
 
     llvm::BasicBlock* generate_block(const std::string& block_name);
 
 private:
-    size_t blocks_{0};
+    std::vector<llvm::BasicBlock*> blocks_;
     llvm::LLVMContext context_{};
     llvm::IRBuilder<> builder_;
     std::unique_ptr<llvm::Module> module_;

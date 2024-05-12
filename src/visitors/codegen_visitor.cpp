@@ -48,16 +48,18 @@ CodegenVisitor::CodegenVisitor(const std::string& mod_name)
     : builder_(context_)
     , module_(std::make_unique<llvm::Module>(mod_name, context_)) {
     current_scope_ = std::make_shared<Scope>("global");
+    get_printf();
+    get_scanf();
 }
 
 [[maybe_unused]]
 llvm::Type* CodegenVisitor::type_to_llvm_type(TypeSpecifier type_specifier) {
     switch (type_specifier) {
+        case TypeSpecifier::CharType: [[fallthrough]];
         case TypeSpecifier::U8Type: [[fallthrough]];
         case TypeSpecifier::I8Type: return builder_.getInt8Ty();
         case TypeSpecifier::U16Type: [[fallthrough]];
         case TypeSpecifier::I16Type: return builder_.getInt16Ty();
-        case TypeSpecifier::CharType: [[fallthrough]];
         case TypeSpecifier::U32Type: [[fallthrough]];
         case TypeSpecifier::I32Type: return builder_.getInt32Ty();
         case TypeSpecifier::U64Type: [[fallthrough]];
@@ -121,7 +123,7 @@ void CodegenVisitor::visit(FunctionDefinition* function_definition) {
     // Create a new scope for each function.
     current_scope_ = std::make_shared<Scope>(func_name, current_scope_);
 
-    auto ret_type = function_definition->return_type();
+    [[maybe_unused]] auto ret_type = function_definition->return_type();
     std::vector<llvm::Type*> arg_types;
     auto args = function_definition->parameter_list();
 
@@ -136,20 +138,31 @@ void CodegenVisitor::visit(FunctionDefinition* function_definition) {
     auto func_type = llvm::FunctionType::get(builder_.getInt32Ty(), args_ref, /* isVarArg */ false);
     current_function_ = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage, func_name, module_.get());
 
-    if (args.size()) {
-        auto entry = generate_block(func_name + ".entry");
-        builder_.SetInsertPoint(entry);
+    auto entry = generate_block(func_name + ".entry");
+    builder_.SetInsertPoint(entry);
 
-        for (size_t i = 0; i < args.size(); i++) {
-            auto arg = current_function_->getArg(i);
-            auto new_var = builder_.CreateAlloca(arg->getType(), arg);
-            current_scope_->add_variable(args.at(i).second, new_var);
-        }
+    for (size_t i = 0; i < args.size(); i++) {
+        auto arg = current_function_->getArg(i);
+        auto new_var = builder_.CreateAlloca(arg->getType(), arg);
+        current_scope_->add_variable(args.at(i).second, new_var);
     }
 
     auto body = function_definition->function_body();
     body->accept_visitor(this);
-    // Return to the parent scope.
+
+    for (size_t i = 1; i < blocks_.size(); i++) {
+        auto block = blocks_[i - 1];
+        auto successor = blocks_[i];
+        auto terminator = block->getTerminator();
+
+        if (!terminator) {
+            builder_.SetInsertPoint(block);
+            builder_.CreateBr(successor);
+        }
+    }
+
+    blocks_.clear();
+    // End of the function's scope.
     current_scope_ = current_scope_->parent();
 }
 
@@ -251,7 +264,6 @@ void CodegenVisitor::visit([[maybe_unused]] IterationStatement* iteration_statem
     cond_block_ = cond_block;
     out_block_ = out_block;
 
-    builder_.CreateBr(cond_block);
     builder_.SetInsertPoint(cond_block);
     auto condition = iteration_statement->condition();
     condition->accept_visitor(this);
@@ -296,8 +308,6 @@ void CodegenVisitor::visit(AssignmentExpression* assignment_expression) {
 
     // TODO: Support different assignment operations.
     auto new_val = builder_.CreateStore(value, variable);
-    latest_values_.push(new_val);
-    current_scope_->add_variable(name, new_val);
 }
 
 void CodegenVisitor::visit(LorExpression* logical_or_expression) {
@@ -448,6 +458,37 @@ void CodegenVisitor::visit(StringExpression* string_expression) {
     latest_values_.push(value);
 }
 
+// void CodefenVisitor::visist(FunctionCallExression* function_call_expression) {
+//     auto name = function_call_expression->identifier();
+//     auto found_func = scope_find_function(name, current_scope_);
+    
+//     if (!found_func) {
+//         return;
+//     }
+
+//     auto func_type = found_func->getFunctionType();
+//     auto func_callee = module_->getOrInsertFunction(name, func_type);
+//     builder_.CreateCall(func_callee, args);
+// }
+
+llvm::FunctionCallee CodegenVisitor::get_printf() {
+    auto printf_ret = builder_.getInt32Ty();
+    std::vector<llvm::Type*> printf_args;
+    printf_args.push_back(builder_.getInt8Ty()->getPointerTo());
+    llvm::ArrayRef<llvm::Type*> args_ref(printf_args);
+    auto printf_type = llvm::FunctionType::get(printf_ret, args_ref, /* IsVarArg */ true);
+    return module_->getOrInsertFunction("printf", printf_type);
+}
+
+llvm::FunctionCallee CodegenVisitor::get_scanf() {
+    auto scanf_ret = builder_.getInt32Ty();
+    std::vector<llvm::Type*> scanf_args;
+    scanf_args.push_back(builder_.getInt8Ty()->getPointerTo());
+    llvm::ArrayRef<llvm::Type*> args_ref(scanf_args);
+    auto scanf_type = llvm::FunctionType::get(scanf_ret, args_ref, /* IsVarArg */ true);
+    return module_->getOrInsertFunction("scanf", scanf_type);
+}
+
 template<class T>
 void CodegenVisitor::visit_binary_op(T* binary_op, BinaryOp op_func) {
     auto visit_expr = [this](Expression* expr) -> llvm::Value* {
@@ -465,8 +506,10 @@ void CodegenVisitor::visit_binary_op(T* binary_op, BinaryOp op_func) {
 }
 
 llvm::BasicBlock* CodegenVisitor::generate_block(const std::string& block_name) {
-    auto id = "." + std::to_string(blocks_++);
-    return llvm::BasicBlock::Create(context_, block_name + id, current_function_);
+    auto id = "." + std::to_string(blocks_.size());
+    auto new_bb = llvm::BasicBlock::Create(context_, block_name + id, current_function_);
+    blocks_.push_back(new_bb);
+    return new_bb;
 }
 
 }; // namespace nezoku
