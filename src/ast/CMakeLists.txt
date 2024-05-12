@@ -32,6 +32,7 @@ list(
     ${CMAKE_CURRENT_SOURCE_DIR}/mul_expression.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/div_expression.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/mod_expression.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/function_call_expression.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/identifier_expression.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/constant_expression.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/string_expression.cpp

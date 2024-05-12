@@ -32,6 +32,7 @@
 #include "ast/mul_expression.hpp"
 #include "ast/div_expression.hpp"
 #include "ast/mod_expression.hpp"
+#include "ast/function_call_expression.hpp"
 #include "ast/identifier_expression.hpp"
 #include "ast/constant_expression.hpp"
 #include "ast/string_expression.hpp"
@@ -329,6 +330,30 @@ void PrintingVisitor::visit(DivExpression* div_expression) {
 
 void PrintingVisitor::visit(ModExpression* mod_expression) {
     visit_binary_op(mod_expression, "%");
+}
+
+void PrintingVisitor::visit(FunctionCallExpression* function_call_expression) {
+    print_tabs();
+    stream_ << "[function call]:" << std::endl;
+    tabs_++;
+    
+    auto function = function_call_expression->function();
+    print_tabs();
+    stream_ << "[function]:" << std::endl;
+    tabs_++;
+    function->accept_visitor(this);
+    tabs_--;
+
+    auto args = function_call_expression->argument_list();
+    print_tabs();
+    stream_ << "[args]:" << std::endl;
+    tabs_++;
+
+    for (const auto& arg: args) {
+        arg->accept_visitor(this);
+    }
+
+    tabs_ -= 2;
 }
 
 void PrintingVisitor::visit(IdentifierExpression* identifier_expression) {

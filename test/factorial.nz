@@ -1,0 +1,13 @@
+i32 factorial(i32 num)
+    if (num == 0)
+        return 1;
+    else
+        return num * factorial(num - 1);
+
+i32 main() {
+    i32 num = 5;
+    i32 num_fact = factorial(num);
+    printf("%d", num_fact);
+    return 0;
+}
+

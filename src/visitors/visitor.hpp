@@ -40,6 +40,7 @@ public:
     virtual void visit(MulExpression* mul_expression) = 0;
     virtual void visit(DivExpression* div_expression) = 0;
     virtual void visit(ModExpression* mod_expression) = 0;
+    virtual void visit(FunctionCallExpression* function_call_expression) = 0;
     virtual void visit(IdentifierExpression* identifier_expression) = 0;
     virtual void visit(ConstantExpression* constant_expression) = 0;
     virtual void visit(StringExpression* string_expression) = 0;

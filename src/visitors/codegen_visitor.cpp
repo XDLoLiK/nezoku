@@ -32,6 +32,7 @@
 #include "ast/mul_expression.hpp"
 #include "ast/div_expression.hpp"
 #include "ast/mod_expression.hpp"
+#include "ast/function_call_expression.hpp"
 #include "ast/identifier_expression.hpp"
 #include "ast/constant_expression.hpp"
 #include "ast/string_expression.hpp"
@@ -115,6 +116,7 @@ void CodegenVisitor::visit(FunctionDefinition* function_definition) {
     // TODO: Support more types.
     auto func_type = llvm::FunctionType::get(builder_.getInt32Ty(), args_ref, /* isVarArg */ false);
     current_function_ = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage, func_name, module_.get());
+    functions_->add_value(func_name, current_function_);
 
     auto entry = generate_block(func_name + ".entry");
     builder_.SetInsertPoint(entry);
@@ -417,6 +419,52 @@ void CodegenVisitor::visit(ModExpression* mod_expression) {
     visit_binary_op(mod_expression, call);
 }
 
+void CodegenVisitor::visit(FunctionCallExpression* function_call_expression) {
+    // TODO: Support function pointers.
+    auto left_expr = function_call_expression->function();
+    auto id_expr = dynamic_cast<IdentifierExpression*>(left_expr);
+
+    // Type checking for a function name.
+    if (!id_expr) {
+        // TODO: Throw error.
+        return;
+    }
+
+    std::vector<llvm::Value*> args;
+    auto arg_list = function_call_expression->argument_list();
+
+    for (const auto& arg : arg_list) {
+        arg->accept_visitor(this);
+        args.push_back(latest_values_.top());
+        latest_values_.pop();
+    }
+
+    auto args_ref = llvm::ArrayRef<llvm::Value*>(args);
+    auto name = id_expr->identifier();
+    auto found_func = scope_find_value(name, functions_);
+
+    // TODO: Clean the code here.
+    if (!found_func) {
+        if (name == "printf") {
+            auto func_callee = get_printf();
+            auto ret_value = builder_.CreateCall(func_callee, args_ref);
+            latest_values_.push(ret_value);
+        } else if (name == "scanf") {
+            auto func_callee = get_scanf();
+            auto ret_value = builder_.CreateCall(func_callee, args_ref);
+            latest_values_.push(ret_value);
+        } else {
+            // TODO: Throw error.
+            return;
+        }
+    } else {
+        auto func_type = found_func->getFunctionType();
+        auto func_callee = module_->getOrInsertFunction(name, func_type);
+        auto ret_value = builder_.CreateCall(func_callee, args_ref);
+        latest_values_.push(ret_value);
+    }
+}
+
 void CodegenVisitor::visit(IdentifierExpression* identifier_expression) {
     auto name = identifier_expression->identifier();
     llvm::Value* value = scope_find_value(name, current_scope_);
@@ -438,19 +486,6 @@ void CodegenVisitor::visit(StringExpression* string_expression) {
     auto value = builder_.CreateGlobalStringPtr(str);
     latest_values_.push(value);
 }
-
-// void CodefenVisitor::visist(FunctionCallExression* function_call_expression) {
-//     auto name = function_call_expression->identifier();
-//     auto found_func = scope_find_function(name, current_scope_);
-    
-//     if (!found_func) {
-//         return;
-//     }
-
-//     auto func_type = found_func->getFunctionType();
-//     auto func_callee = module_-  >getOrInsertFunction(name, func_type);
-//     builder_.CreateCall(func_callee, args);
-// }
 
 llvm::FunctionCallee CodegenVisitor::get_printf() {
     auto printf_ret = builder_.getInt32Ty();

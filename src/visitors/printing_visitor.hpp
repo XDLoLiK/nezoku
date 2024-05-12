@@ -45,6 +45,7 @@ public:
     void visit(MulExpression* mul_expression) override;
     void visit(DivExpression* div_expression) override;
     void visit(ModExpression* mod_expression) override;
+    void visit(FunctionCallExpression* function_call_expression) override;
     void visit(IdentifierExpression* identifier_expression) override;
     void visit(ConstantExpression* constant_expression) override;
     void visit(StringExpression* string_expression) override;

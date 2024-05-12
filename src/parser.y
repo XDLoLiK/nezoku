@@ -70,6 +70,7 @@
 	#include "ast/mul_expression.hpp"
 	#include "ast/div_expression.hpp"
 	#include "ast/mod_expression.hpp"
+	#include "ast/function_call_expression.hpp"
 	#include "ast/identifier_expression.hpp"
 	#include "ast/constant_expression.hpp"
 	#include "ast/string_expression.hpp"
@@ -214,8 +215,9 @@
 %nterm <nezoku::Expression*> shift_expression
 %nterm <nezoku::Expression*> additive_expression
 %nterm <nezoku::Expression*> multiplicative_expression
+%nterm <nezoku::Expression*>postfix_expression
 %nterm <nezoku::Expression*> primary_expression
-/* %nterm <std::vector<nezoku::Expression*>> argument_expression_list */
+%nterm <std::vector<nezoku::Expression*>> argument_expression_list
 
 %%
 
@@ -439,23 +441,20 @@ additive_expression
 	;
 
 multiplicative_expression
-    : primary_expression { $$ = $1; };
-	| multiplicative_expression MUL primary_expression { $$ = new nezoku::MulExpression($1, $3); };
-	| multiplicative_expression DIV primary_expression { $$ = new nezoku::DivExpression($1, $3); };
-	| multiplicative_expression MOD primary_expression { $$ = new nezoku::ModExpression($1, $3); };
+    : postfix_expression { $$ = $1; };
+	| multiplicative_expression MUL postfix_expression { $$ = new nezoku::MulExpression($1, $3); };
+	| multiplicative_expression DIV postfix_expression { $$ = new nezoku::DivExpression($1, $3); };
+	| multiplicative_expression MOD postfix_expression { $$ = new nezoku::ModExpression($1, $3); };
 	;
 
-primary_expression
-    : IDENTIFIER { $$ = new nezoku::IdentifierExpression($1); };
-    | CONSTANT { $$ = new nezoku::ConstantExpression($1); };
-	| STRING_LITERAL { $$ = new nezoku::StringExpression($1); };
-	| LPAREN expression RPAREN { $$ = $2; };
-	/* | IDENTIFIER LPAREN argument_expression_list RPAREN { $$ = new nezoku::FunctionCallExpression($1, $3); }; */
-    ;
+postfix_expression
+	: primary_expression { $$ = $1; };
+	| postfix_expression LPAREN RPAREN { $$ = new nezoku::FunctionCallExpression($1); };
+	| postfix_expression LPAREN argument_expression_list RPAREN { $$ = new nezoku::FunctionCallExpression($1, $3); };
+	;
 
-	/*
-	argument_expression_list
-	: expression {
+argument_expression_list
+	: assignment_expression {
 		$$ = std::vector<nezoku::Expression*>();
 		$$.push_back($1);
 	};
@@ -464,7 +463,13 @@ primary_expression
 		$$ = $1;
 	};
 	;
-	*/
+
+primary_expression
+    : IDENTIFIER { $$ = new nezoku::IdentifierExpression($1); };
+    | CONSTANT { $$ = new nezoku::ConstantExpression($1); };
+	| STRING_LITERAL { $$ = new nezoku::StringExpression($1); };
+	| LPAREN expression RPAREN { $$ = $2; };
+    ;
 
 %%
 

@@ -46,6 +46,6 @@ set_target_properties(
     OUTPUT_NAME nezoku
 )
 
-llvm_map_components_to_libnames(LLVM core)
+llvm_map_components_to_libnames(LLVM core executionengine)
 target_link_libraries(NEZOKU ${LLVM})
 

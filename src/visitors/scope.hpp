@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+
 namespace nezoku {
 
 template<class V>

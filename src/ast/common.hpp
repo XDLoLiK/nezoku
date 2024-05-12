@@ -39,6 +39,7 @@ class SubExpression;
 class MulExpression;
 class DivExpression;
 class ModExpression;
+class FunctionCallExpression;
 class IdentifierExpression;
 class ConstantExpression;
 class StringExpression;
