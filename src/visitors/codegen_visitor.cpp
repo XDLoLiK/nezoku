@@ -256,7 +256,7 @@ void CodegenVisitor::visit(SelectionStatement* selection_statement) {
     builder_.SetInsertPoint(out_block);
 }
 
-void CodegenVisitor::visit([[maybe_unused]] IterationStatement* iteration_statement) {
+void CodegenVisitor::visit(IterationStatement* iteration_statement) {
     auto cond_block = generate_block("while.condition");
     auto iter_block = generate_block("while.body");
     auto out_block = generate_block("while.out");
@@ -304,10 +304,12 @@ void CodegenVisitor::visit(AssignmentExpression* assignment_expression) {
     right_expr->accept_visitor(this);
     auto value = latest_values_.top();
     assert(value);
-    latest_values_.pop();
+    // Not doing it here here deliberately.
+    // latest_values_.pop();    
 
     // TODO: Support different assignment operations.
     auto new_val = builder_.CreateStore(value, variable);
+
 }
 
 void CodegenVisitor::visit(LorExpression* logical_or_expression) {

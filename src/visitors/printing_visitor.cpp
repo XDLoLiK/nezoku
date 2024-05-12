@@ -227,7 +227,7 @@ void PrintingVisitor::visit(SelectionStatement* selection_statement) {
     tabs_ -= 2;
 }
 
-void PrintingVisitor::visit([[maybe_unused]] IterationStatement* iteration_statement) {
+void PrintingVisitor::visit(IterationStatement* iteration_statement) {
     print_tabs();
     stream_ << "[loop]:" << std::endl;
     tabs_++;
