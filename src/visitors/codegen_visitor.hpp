@@ -28,8 +28,6 @@ public:
     CodegenVisitor(const std::string& file);
     virtual ~CodegenVisitor() = default;
 
-    [[maybe_unused]]
-    llvm::Type* type_to_llvm_type(TypeSpecifier type_specifier);
     std::error_code write_to(const std::string& file_name);
 
     void visit(TranslationUnit* translation_unit) override;
@@ -85,7 +83,9 @@ private:
     llvm::BasicBlock* cond_block_{nullptr};
     llvm::BasicBlock* out_block_{nullptr};
     std::stack<llvm::Value*> latest_values_;
-    std::shared_ptr<Scope<llvm::Function, llvm::Value>> current_scope_;
+    std::shared_ptr<Scope<llvm::Value>> current_scope_;
+    std::shared_ptr<Scope<llvm::Function>> functions_;
+    std::shared_ptr<Scope<llvm::BasicBlock>> jump_table_;
 };
 
 }; // namespace nezoku

@@ -44,35 +44,13 @@ namespace nezoku {
 template<class... Ts> struct VariantVisitor: Ts... { using Ts::operator()...; };
 template<class... Ts> VariantVisitor(Ts...) -> VariantVisitor<Ts...>;
 
+// TODO: Mod name should be the same as file name.
 CodegenVisitor::CodegenVisitor(const std::string& mod_name)
     : builder_(context_)
-    , module_(std::make_unique<llvm::Module>(mod_name, context_)) {
-    current_scope_ = std::make_shared<Scope<llvm::Function, llvm::Value>>("global");
-    get_printf();
-    get_scanf();
-}
-
-[[maybe_unused]]
-llvm::Type* CodegenVisitor::type_to_llvm_type(TypeSpecifier type_specifier) {
-    switch (type_specifier) {
-        case TypeSpecifier::CharType: [[fallthrough]];
-        case TypeSpecifier::U8Type: [[fallthrough]];
-        case TypeSpecifier::I8Type: return builder_.getInt8Ty();
-        case TypeSpecifier::U16Type: [[fallthrough]];
-        case TypeSpecifier::I16Type: return builder_.getInt16Ty();
-        case TypeSpecifier::U32Type: [[fallthrough]];
-        case TypeSpecifier::I32Type: return builder_.getInt32Ty();
-        case TypeSpecifier::U64Type: [[fallthrough]];
-        case TypeSpecifier::I64Type: return builder_.getInt64Ty();
-        case TypeSpecifier::F32Type: return builder_.getFloatTy();
-        case TypeSpecifier::F64Type: return builder_.getDoubleTy();
-        case TypeSpecifier::BoolType: return builder_.getInt1Ty();
-        case TypeSpecifier::VoidType: return builder_.getVoidTy();
-        case TypeSpecifier::MaxType: return nullptr;
-    }
-
-    // Default.
-    return nullptr;
+    , module_(std::make_unique<llvm::Module>(mod_name, context_))
+    , current_scope_(std::make_shared<Scope<llvm::Value>>("global"))
+    , functions_(std::make_shared<Scope<llvm::Function>>("global"))
+    , jump_table_(std::make_shared<Scope<llvm::BasicBlock>>("global")) {
 }
 
 std::error_code CodegenVisitor::write_to(const std::string& file_name) {
@@ -115,13 +93,13 @@ void CodegenVisitor::visit(Declaration* declaration) {
     // TODO: Support more types.
     auto new_var = builder_.CreateAlloca(builder_.getInt32Ty(), value);
     latest_values_.push(new_var);
-    current_scope_->add_variable(name, new_var);
+    current_scope_->add_value(name, new_var);
 }
 
 void CodegenVisitor::visit(FunctionDefinition* function_definition) {
     auto func_name = function_definition->function_name();
     // Create a new scope for each function.
-    current_scope_ = std::make_shared<Scope<llvm::Function, llvm::Value>>(func_name, current_scope_);
+    current_scope_ = std::make_shared<Scope<llvm::Value>>(func_name, current_scope_);
 
     [[maybe_unused]] auto ret_type = function_definition->return_type();
     std::vector<llvm::Type*> arg_types;
@@ -144,7 +122,7 @@ void CodegenVisitor::visit(FunctionDefinition* function_definition) {
     for (size_t i = 0; i < args.size(); i++) {
         auto arg = current_function_->getArg(i);
         auto new_var = builder_.CreateAlloca(arg->getType(), arg);
-        current_scope_->add_variable(args.at(i).second, new_var);
+        current_scope_->add_value(args.at(i).second, new_var);
     }
 
     auto body = function_definition->function_body();
@@ -168,7 +146,7 @@ void CodegenVisitor::visit(FunctionDefinition* function_definition) {
 
 void CodegenVisitor::visit(CompoundStatement* compound_statement) {
     // Create a new scope for each compound statement.
-    current_scope_ = std::make_shared<Scope<llvm::Function, llvm::Value>>(current_scope_);
+    current_scope_ = std::make_shared<Scope<llvm::Value>>(current_scope_);
 
     for (const auto& block_item: compound_statement->block_item_list()) {
         std::visit(
@@ -293,7 +271,7 @@ void CodegenVisitor::visit(AssignmentExpression* assignment_expression) {
     }
 
     auto name = id_expr->identifier();
-    auto variable = scope_find_variable(name, current_scope_);
+    auto variable = scope_find_value(name, current_scope_);
 
     if (!variable) {
         // TODO: Throw error.
@@ -304,12 +282,13 @@ void CodegenVisitor::visit(AssignmentExpression* assignment_expression) {
     right_expr->accept_visitor(this);
     auto value = latest_values_.top();
     assert(value);
-    // Not doing it here here deliberately.
-    // latest_values_.pop();    
+    latest_values_.pop();
 
     // TODO: Support different assignment operations.
-    auto new_val = builder_.CreateStore(value, variable);
-
+    builder_.CreateStore(value, variable);
+    auto new_value = builder_.CreateLoad(variable->getType(), variable);
+    // TODO: Detect and discard (pop) unused expressions.
+    latest_values_.push(new_value);
 }
 
 void CodegenVisitor::visit(LorExpression* logical_or_expression) {
@@ -440,7 +419,7 @@ void CodegenVisitor::visit(ModExpression* mod_expression) {
 
 void CodegenVisitor::visit(IdentifierExpression* identifier_expression) {
     auto name = identifier_expression->identifier();
-    llvm::Value* value = scope_find_variable(name, current_scope_);
+    llvm::Value* value = scope_find_value(name, current_scope_);
     // TODO: Support more types.
     auto load = builder_.CreateLoad(builder_.getInt32Ty(), value);
     latest_values_.push(load);
