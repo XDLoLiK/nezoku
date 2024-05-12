@@ -4,7 +4,6 @@
 #include "ast/function_definition.hpp"
 #include "ast/declaration.hpp"
 
-#include "ast/statement.hpp"
 #include "ast/compound_statement.hpp"
 #include "ast/return_statement.hpp"
 #include "ast/expression_statement.hpp"
@@ -13,7 +12,6 @@
 #include "ast/selection_statement.hpp"
 #include "ast/iteration_statement.hpp"
 
-#include "ast/expression.hpp"
 #include "ast/comma_expression.hpp"
 #include "ast/assignment_expression.hpp"
 #include "ast/logical_or_expression.hpp"

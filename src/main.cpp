@@ -13,7 +13,8 @@ int main(int argc, char** argv) {
         } else {
             driver.parse(argv[i]);
             driver.print_tree(argv[i + 1]);
-            i++;
+            driver.compile(argv[i + 2]);
+            i += 2;
         }
     }
 

@@ -44,26 +44,44 @@ namespace nezoku {
 template<class... Ts> struct VariantVisitor: Ts... { using Ts::operator()...; };
 template<class... Ts> VariantVisitor(Ts...) -> VariantVisitor<Ts...>;
 
-template<class T>
-static T parse_constant(const std::string& constant) {
-    // TODO: Implement.
-    return;
-}
-
 CodegenVisitor::CodegenVisitor(const std::string& mod_name)
     : builder_(context_)
     , module_(std::make_unique<llvm::Module>(mod_name, context_)) {
-    // TODO: Implement.
-    return;
+    current_scope_ = std::make_shared<Scope>("global");
+}
+
+[[maybe_unused]]
+llvm::Type* CodegenVisitor::type_to_llvm_type(TypeSpecifier type_specifier) {
+    switch (type_specifier) {
+        case TypeSpecifier::U8Type: [[fallthrough]];
+        case TypeSpecifier::I8Type: return builder_.getInt8Ty();
+        case TypeSpecifier::U16Type: [[fallthrough]];
+        case TypeSpecifier::I16Type: return builder_.getInt16Ty();
+        case TypeSpecifier::CharType: [[fallthrough]];
+        case TypeSpecifier::U32Type: [[fallthrough]];
+        case TypeSpecifier::I32Type: return builder_.getInt32Ty();
+        case TypeSpecifier::U64Type: [[fallthrough]];
+        case TypeSpecifier::I64Type: return builder_.getInt64Ty();
+        case TypeSpecifier::F32Type: return builder_.getFloatTy();
+        case TypeSpecifier::F64Type: return builder_.getDoubleTy();
+        case TypeSpecifier::BoolType: return builder_.getInt1Ty();
+        case TypeSpecifier::VoidType: return builder_.getVoidTy();
+        case TypeSpecifier::MaxType: return nullptr;
+    }
+
+    // Default.
+    return nullptr;
 }
 
 std::error_code CodegenVisitor::write_to(const std::string& file_name) {
-    llvm::StringRef file_ref(file_name);
     std::error_code err;
-    llvm::raw_fd_ostream out_file(file_ref, err);
-    module_->print(out_file, nullptr);
-    out_file.flush();
-    out_file.close();
+    llvm::raw_fd_ostream out_file(file_name, err);
+
+    if (!err) {
+        module_->print(out_file, nullptr);
+        out_file.close();
+    }
+
     return err;
 }
 
@@ -80,16 +98,65 @@ void CodegenVisitor::visit(TranslationUnit* translation_unit) {
 }
 
 void CodegenVisitor::visit(Declaration* declaration) {
-    // TODO: Implement.
-    return;
+    auto type = declaration->variable_type();
+    auto name = declaration->variable_name();
+    llvm::Value* value = nullptr;
+    auto init = declaration->initializer();
+
+    if (init) {
+        init->accept_visitor(this);
+        value = latest_values_.top();
+        assert(value);
+        latest_values_.pop();
+    }
+
+    // TODO: Support more types.
+    auto new_var = builder_.CreateAlloca(builder_.getInt32Ty(), value);
+    latest_values_.push(new_var);
+    current_scope_->add_variable(name, new_var);
 }
 
 void CodegenVisitor::visit(FunctionDefinition* function_definition) {
-    // TODO: Implement.
-    return;
+    auto func_name = function_definition->function_name();
+    // Create a new scope for each function.
+    current_scope_ = std::make_shared<Scope>(func_name, current_scope_);
+
+    auto ret_type = function_definition->return_type();
+    std::vector<llvm::Type*> arg_types;
+    auto args = function_definition->parameter_list();
+
+    for (const auto& arg: args) {
+        // TODO: Support more types.
+        auto arg_type = builder_.getInt32Ty();
+        arg_types.push_back(arg_type);
+    }
+
+    llvm::ArrayRef<llvm::Type*> args_ref(arg_types);
+    // TODO: Support more types.
+    auto func_type = llvm::FunctionType::get(builder_.getInt32Ty(), args_ref, /* isVarArg */ false);
+    current_function_ = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage, func_name, module_.get());
+
+    if (args.size()) {
+        auto entry = generate_block(func_name + ".entry");
+        builder_.SetInsertPoint(entry);
+
+        for (size_t i = 0; i < args.size(); i++) {
+            auto arg = current_function_->getArg(i);
+            auto new_var = builder_.CreateAlloca(arg->getType(), arg);
+            current_scope_->add_variable(args.at(i).second, new_var);
+        }
+    }
+
+    auto body = function_definition->function_body();
+    body->accept_visitor(this);
+    // Return to the parent scope.
+    current_scope_ = current_scope_->parent();
 }
 
 void CodegenVisitor::visit(CompoundStatement* compound_statement) {
+    // Create a new scope for each compound statement.
+    current_scope_ = std::make_shared<Scope>(current_scope_);
+
     for (const auto& block_item: compound_statement->block_item_list()) {
         std::visit(
             VariantVisitor{
@@ -99,6 +166,9 @@ void CodegenVisitor::visit(CompoundStatement* compound_statement) {
             block_item
         );
     }
+
+    // Return to the parent scope.
+    current_scope_ = current_scope_->parent();
 }
 
 void CodegenVisitor::visit(ExpressionStatement* expression_statement) {
@@ -120,6 +190,7 @@ void CodegenVisitor::visit(ReturnStatement* return_statement) {
     }
 
     auto ret_value = latest_values_.top();
+    assert(ret_value);
     latest_values_.pop();
     builder_.CreateRet(ret_value);
 }
@@ -141,19 +212,20 @@ void CodegenVisitor::visit([[maybe_unused]] BreakStatement* break_statement) {
 }
 
 void CodegenVisitor::visit(SelectionStatement* selection_statement) {
-    auto then_block = generate_block();
+    auto then_block = generate_block("if.true");
     llvm::BasicBlock* else_block = nullptr;
-    auto out_block = generate_block();
+    auto out_block = generate_block("if.out");
 
     auto condition = selection_statement->if_expression();
     condition->accept_visitor(this);
     auto condition_value = latest_values_.top();
+    assert(condition_value);
     latest_values_.pop();
 
     auto else_body = selection_statement->else_statement();
 
     if (else_body) {
-        else_block = generate_block();
+        else_block = generate_block("if.false");
         builder_.CreateCondBr(condition_value, then_block, else_block);
     } else {
         builder_.CreateCondBr(condition_value, then_block, out_block);
@@ -162,42 +234,70 @@ void CodegenVisitor::visit(SelectionStatement* selection_statement) {
     builder_.SetInsertPoint(then_block);
     auto if_body = selection_statement->then_statement();
     if_body->accept_visitor(this);
-    builder_.CreateBr(out_block);
 
     if (else_body) {
         builder_.SetInsertPoint(else_block);
         else_body->accept_visitor(this);
-        builder_.CreateBr(out_block);
     }
 
     builder_.SetInsertPoint(out_block);
 }
 
 void CodegenVisitor::visit([[maybe_unused]] IterationStatement* iteration_statement) {
-    cond_block_ = generate_block();
-    auto iter_block = generate_block();
-    out_block_ = generate_block();
+    auto cond_block = generate_block("while.condition");
+    auto iter_block = generate_block("while.body");
+    auto out_block = generate_block("while.out");
 
-    builder_.SetInsertPoint(cond_block_);
+    cond_block_ = cond_block;
+    out_block_ = out_block;
+
+    builder_.CreateBr(cond_block);
+    builder_.SetInsertPoint(cond_block);
     auto condition = iteration_statement->condition();
     condition->accept_visitor(this);
     auto condition_value = latest_values_.top();
+    assert(condition_value);
     latest_values_.pop();
-    builder_.CreateCondBr(condition_value, iter_block, out_block_);
+    builder_.CreateCondBr(condition_value, iter_block, out_block);
 
     builder_.SetInsertPoint(iter_block);
     auto body = iteration_statement->body();
     body->accept_visitor(this);
-    builder_.CreateBr(cond_block_);
-    
-    builder_.SetInsertPoint(out_block_);
+    builder_.CreateBr(cond_block);
+
+    builder_.SetInsertPoint(out_block);
     cond_block_ = nullptr;
     out_block_ = nullptr;
 }
 
 void CodegenVisitor::visit(AssignmentExpression* assignment_expression) {
-    // TODO: Implement.
-    return;
+    auto left_expr = assignment_expression->left_expression();
+    auto id_expr = dynamic_cast<IdentifierExpression*>(left_expr);
+
+    // Type checking for the left side to be an lvalue.
+    if (!id_expr) {
+        // TODO: Throw error.
+        return;
+    }
+
+    auto name = id_expr->identifier();
+    auto variable = scope_find_variable(name, current_scope_);
+
+    if (!variable) {
+        // TODO: Throw error.
+        return;
+    }
+
+    auto right_expr = assignment_expression->right_expression();
+    right_expr->accept_visitor(this);
+    auto value = latest_values_.top();
+    assert(value);
+    latest_values_.pop();
+
+    // TODO: Support different assignment operations.
+    auto new_val = builder_.CreateStore(value, variable);
+    latest_values_.push(new_val);
+    current_scope_->add_variable(name, new_val);
 }
 
 void CodegenVisitor::visit(LorExpression* logical_or_expression) {
@@ -327,17 +427,24 @@ void CodegenVisitor::visit(ModExpression* mod_expression) {
 }
 
 void CodegenVisitor::visit(IdentifierExpression* identifier_expression) {
-    // TODO: Implement.
-    return;
+    auto name = identifier_expression->identifier();
+    llvm::Value* value = scope_find_variable(name, current_scope_);
+    // TODO: Support more types.
+    auto load = builder_.CreateLoad(builder_.getInt32Ty(), value);
+    latest_values_.push(load);
 }
 
 void CodegenVisitor::visit(ConstantExpression* constant_expression) {
-    // TODO: Implement.
-    return;
+    auto constant = constant_expression->constant();
+    auto converted = std::stoll(constant);
+    // TODO: Support more types.
+    auto value = llvm::ConstantInt::get(builder_.getInt32Ty(), converted, /* IsSigned */ true);
+    latest_values_.push(value);
 }
 
 void CodegenVisitor::visit(StringExpression* string_expression) {
-    auto value = builder_.CreateGlobalStringPtr(string_expression->string());
+    auto str = string_expression->string();
+    auto value = builder_.CreateGlobalStringPtr(str);
     latest_values_.push(value);
 }
 
@@ -346,6 +453,7 @@ void CodegenVisitor::visit_binary_op(T* binary_op, BinaryOp op_func) {
     auto visit_expr = [this](Expression* expr) -> llvm::Value* {
         expr->accept_visitor(this);
         auto value = latest_values_.top();
+        assert(value);
         latest_values_.pop();
         return value;
     };
@@ -356,9 +464,9 @@ void CodegenVisitor::visit_binary_op(T* binary_op, BinaryOp op_func) {
     latest_values_.push(new_value);
 }
 
-llvm::BasicBlock* CodegenVisitor::generate_block() {
-    auto id = std::to_string(blocks_++);
-    return llvm::BasicBlock::Create(context_, "Block" + id, current_function_);
+llvm::BasicBlock* CodegenVisitor::generate_block(const std::string& block_name) {
+    auto id = "." + std::to_string(blocks_++);
+    return llvm::BasicBlock::Create(context_, block_name + id, current_function_);
 }
 
 }; // namespace nezoku

@@ -13,6 +13,10 @@
 #include "llvm/IR/Module.h"
 
 #include "visitor.hpp"
+#include "scope.hpp"
+#include "common.hpp"
+#include "ast/type_specifier.hpp"
+#include "ast/assignment_operator.hpp"
 
 namespace nezoku {
 
@@ -23,6 +27,8 @@ public:
     CodegenVisitor(const std::string& file);
     virtual ~CodegenVisitor() = default;
 
+    [[maybe_unused]]
+    llvm::Type* type_to_llvm_type(TypeSpecifier type_specifier);
     std::error_code write_to(const std::string& file_name);
 
     void visit(TranslationUnit* translation_unit) override;
@@ -64,7 +70,7 @@ private:
     template<class T>
     void visit_binary_op(T* binary_op, BinaryOp op_func);
 
-    llvm::BasicBlock* generate_block();
+    llvm::BasicBlock* generate_block(const std::string& block_name);
 
 private:
     size_t blocks_{0};
@@ -75,6 +81,7 @@ private:
     llvm::BasicBlock* cond_block_{nullptr};
     llvm::BasicBlock* out_block_{nullptr};
     std::stack<llvm::Value*> latest_values_;
+    std::shared_ptr<Scope> current_scope_;
 };
 
 }; // namespace nezoku

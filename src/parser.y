@@ -367,8 +367,9 @@ expression
 
 assignment_expression
 	: logical_or_expression { $$ = $1; };
-	| primary_expression assignment_operator assignment_expression {
-		$$ = new nezoku::AssignmentExpression($1, $2, $3);
+	| IDENTIFIER assignment_operator assignment_expression {
+		auto identifier_expression = new nezoku::IdentifierExpression($1);
+		$$ = new nezoku::AssignmentExpression(identifier_expression, $2, $3);
 	};
 	;
 
