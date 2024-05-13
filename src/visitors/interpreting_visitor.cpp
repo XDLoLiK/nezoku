@@ -268,11 +268,20 @@ void InterpretingVisitor::visit(FunctionCallExpression* function_call_expression
 }
 
 void InterpretingVisitor::visit(IdentifierExpression* identifier_expression) {
-    // TODO: Implement.
+    auto name = identifier_expression->identifier();
+    auto variable_opt = scope_find_value(name, current_scope_);
+    assert(variable_opt);
+    auto variable = variable_opt.value();
+    // TODO: Support more types.
+    auto value = std::any_cast<int>(variable.second);
+    latest_values_.push(std::make_pair(TypeSpecifier::I32Type, std::any(value)));
 }
 
 void InterpretingVisitor::visit(ConstantExpression* constant_expression) {
-    // TODO: Implement.
+    auto constant = constant_expression->constant();
+    auto converted = std::stoll(constant);
+    // TODO: Support more types.
+    latest_values_.push(std::make_pair(TypeSpecifier::I32Type, std::any(converted)));
 }
 
 void InterpretingVisitor::visit(StringExpression* string_expression) {

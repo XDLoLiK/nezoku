@@ -241,9 +241,9 @@ void CodegenVisitor::visit(AssignmentExpression* assignment_expression) {
     }
 
     auto name = id_expr->identifier();
-    auto variable = scope_find_value(name, current_scope_);
+    auto variable_opt = scope_find_value(name, current_scope_);
 
-    if (!variable) {
+    if (!variable_opt) {
         // TODO: Throw error.
         return;
     }
@@ -254,6 +254,7 @@ void CodegenVisitor::visit(AssignmentExpression* assignment_expression) {
     assert(value);
     latest_values_.pop();
 
+    auto variable = variable_opt.value();
     // TODO: Support different assignment operations.
     builder_.CreateStore(value, variable);
     auto new_value = builder_.CreateLoad(variable->getType(), variable);
@@ -409,10 +410,10 @@ void CodegenVisitor::visit(FunctionCallExpression* function_call_expression) {
 
     auto args_ref = llvm::ArrayRef<llvm::Value*>(args);
     auto name = id_expr->identifier();
-    auto found_func = scope_find_value(name, functions_);
+    auto found_func_opt = scope_find_value(name, functions_);
 
     // TODO: Clean the code here.
-    if (!found_func) {
+    if (!found_func_opt) {
         if (name == "printf") {
             auto func_callee = get_printf();
             auto ret_value = builder_.CreateCall(func_callee, args_ref);
@@ -426,6 +427,7 @@ void CodegenVisitor::visit(FunctionCallExpression* function_call_expression) {
             return;
         }
     } else {
+        auto found_func = found_func_opt.value();
         auto func_type = found_func->getFunctionType();
         auto func_callee = module_->getOrInsertFunction(name, func_type);
         auto ret_value = builder_.CreateCall(func_callee, args_ref);
@@ -435,7 +437,9 @@ void CodegenVisitor::visit(FunctionCallExpression* function_call_expression) {
 
 void CodegenVisitor::visit(IdentifierExpression* identifier_expression) {
     auto name = identifier_expression->identifier();
-    llvm::Value* value = scope_find_value(name, current_scope_);
+    auto value_opt = scope_find_value(name, current_scope_);
+    assert(value_opt);
+    auto value = value_opt.value();
     // TODO: Support more types.
     auto load = builder_.CreateLoad(builder_.getInt32Ty(), value);
     latest_values_.push(load);

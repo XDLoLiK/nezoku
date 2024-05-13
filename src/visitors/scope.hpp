@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include <optional>
 
 namespace nezoku {
 
@@ -33,13 +34,13 @@ public:
         values_.insert(std::make_pair(name, value));
     }
 
-    V get_value(const std::string& name) {
+    std::optional<V> get_value(const std::string& name) {
         auto found = values_.find(name);
 
         if (found != values_.end()) {
             return found->second;
         } else {
-            return nullptr;
+            return std::nullopt;
         }
     }
 
@@ -52,9 +53,9 @@ private:
 };
 
 template<class V>
-static V scope_find_value(const std::string& name, std::shared_ptr<Scope<V>> scope) {
+static std::optional<V> scope_find_value(const std::string& name, std::shared_ptr<Scope<V>> scope) {
     if (!scope) {
-        return nullptr;
+        return std::nullopt;
     }
 
     auto found = scope->get_value(name);
