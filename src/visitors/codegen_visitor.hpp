@@ -15,7 +15,6 @@
 
 #include "visitor.hpp"
 #include "scope.hpp"
-#include "common.hpp"
 #include "ast/type_specifier.hpp"
 #include "ast/assignment_operator.hpp"
 
@@ -84,9 +83,9 @@ private:
     llvm::BasicBlock* cond_block_{nullptr};
     llvm::BasicBlock* out_block_{nullptr};
     std::stack<llvm::Value*> latest_values_;
-    std::shared_ptr<Scope<llvm::Value>> current_scope_;
-    std::shared_ptr<Scope<llvm::Function>> functions_;
-    std::shared_ptr<Scope<llvm::BasicBlock>> jump_table_;
+    std::shared_ptr<Scope<llvm::Value*>> current_scope_;
+    std::shared_ptr<Scope<llvm::Function*>> functions_;
+    std::shared_ptr<Scope<llvm::BasicBlock*>> jump_table_;
 };
 
 }; // namespace nezoku

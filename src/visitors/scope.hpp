@@ -29,11 +29,11 @@ public:
         children_.push_back(child_scope);
     }
 
-    void add_value(const std::string& name, V* value) {
+    void add_value(const std::string& name, V value) {
         values_.insert(std::make_pair(name, value));
     }
 
-    V* get_value(const std::string& name) {
+    V get_value(const std::string& name) {
         auto found = values_.find(name);
 
         if (found != values_.end()) {
@@ -47,12 +47,12 @@ private:
     size_t unnamed_count_{0};
     std::string name_;
     std::shared_ptr<Scope<V>> parent_;
-    std::unordered_map<std::string, V*> values_;
+    std::unordered_map<std::string, V> values_;
     std::vector<std::shared_ptr<Scope<V>>> children_;
 };
 
 template<class V>
-static V* scope_find_value(const std::string& name, std::shared_ptr<Scope<V>> scope) {
+static V scope_find_value(const std::string& name, std::shared_ptr<Scope<V>> scope) {
     if (!scope) {
         return nullptr;
     }

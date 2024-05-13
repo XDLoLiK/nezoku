@@ -1,44 +1,9 @@
 #include "codegen_visitor.hpp"
-
 #include "ast/translation_unit.hpp"
 #include "ast/function_definition.hpp"
 #include "ast/declaration.hpp"
-
-#include "ast/compound_statement.hpp"
-#include "ast/return_statement.hpp"
-#include "ast/expression_statement.hpp"
-#include "ast/break_statement.hpp"
-#include "ast/continue_statement.hpp"
-#include "ast/selection_statement.hpp"
-#include "ast/iteration_statement.hpp"
-
-#include "ast/comma_expression.hpp"
-#include "ast/assignment_expression.hpp"
-#include "ast/logical_or_expression.hpp"
-#include "ast/logical_and_expression.hpp"
-#include "ast/inclusive_or_expression.hpp"
-#include "ast/exclusive_or_expression.hpp"
-#include "ast/and_expression.hpp"
-#include "ast/eq_expression.hpp"
-#include "ast/neq_expression.hpp"
-#include "ast/less_expression.hpp"
-#include "ast/greater_expression.hpp"
-#include "ast/leq_expression.hpp"
-#include "ast/geq_expression.hpp"
-#include "ast/shl_expression.hpp"
-#include "ast/shr_expression.hpp"
-#include "ast/add_expression.hpp"
-#include "ast/sub_expression.hpp"
-#include "ast/mul_expression.hpp"
-#include "ast/div_expression.hpp"
-#include "ast/mod_expression.hpp"
-#include "ast/function_call_expression.hpp"
-#include "ast/identifier_expression.hpp"
-#include "ast/constant_expression.hpp"
-#include "ast/string_expression.hpp"
-
-#include "ast/type_specifier.hpp"
-#include "ast/assignment_operator.hpp"
+#include "all_statements.hpp"
+#include "all_expressions.hpp"
 
 namespace nezoku {
 
@@ -49,9 +14,9 @@ template<class... Ts> VariantVisitor(Ts...) -> VariantVisitor<Ts...>;
 CodegenVisitor::CodegenVisitor(const std::string& mod_name)
     : builder_(context_)
     , module_(std::make_unique<llvm::Module>(mod_name, context_))
-    , current_scope_(std::make_shared<Scope<llvm::Value>>("global"))
-    , functions_(std::make_shared<Scope<llvm::Function>>("global"))
-    , jump_table_(std::make_shared<Scope<llvm::BasicBlock>>("global")) {
+    , current_scope_(std::make_shared<Scope<llvm::Value*>>("global"))
+    , functions_(std::make_shared<Scope<llvm::Function*>>("global"))
+    , jump_table_(std::make_shared<Scope<llvm::BasicBlock*>>("global")) {
 }
 
 std::error_code CodegenVisitor::write_to(const std::string& file_name) {
@@ -102,7 +67,7 @@ void CodegenVisitor::visit(Declaration* declaration) {
 void CodegenVisitor::visit(FunctionDefinition* function_definition) {
     auto func_name = function_definition->function_name();
     // Create a new scope for each function.
-    current_scope_ = std::make_shared<Scope<llvm::Value>>(func_name, current_scope_);
+    current_scope_ = std::make_shared<Scope<llvm::Value*>>(func_name, current_scope_);
 
     [[maybe_unused]] auto ret_type = function_definition->return_type();
     std::vector<llvm::Type*> arg_types;
@@ -151,7 +116,7 @@ void CodegenVisitor::visit(FunctionDefinition* function_definition) {
 
 void CodegenVisitor::visit(CompoundStatement* compound_statement) {
     // Create a new scope for each compound statement.
-    current_scope_ = std::make_shared<Scope<llvm::Value>>(current_scope_);
+    current_scope_ = std::make_shared<Scope<llvm::Value*>>(current_scope_);
 
     for (const auto& block_item: compound_statement->block_item_list()) {
         std::visit(
