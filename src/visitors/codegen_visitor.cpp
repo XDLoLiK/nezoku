@@ -92,7 +92,8 @@ void CodegenVisitor::visit(Declaration* declaration) {
     }
 
     // TODO: Support more types.
-    auto new_var = builder_.CreateAlloca(builder_.getInt32Ty(), value);
+    auto new_var = builder_.CreateAlloca(builder_.getInt32Ty());
+    builder_.CreateStore(value, new_var);
     latest_values_.push(new_var);
     current_scope_->add_value(name, new_var);
 }
@@ -123,7 +124,8 @@ void CodegenVisitor::visit(FunctionDefinition* function_definition) {
 
     for (size_t i = 0; i < args.size(); i++) {
         auto arg = current_function_->getArg(i);
-        auto new_var = builder_.CreateAlloca(arg->getType(), arg);
+        auto new_var = builder_.CreateAlloca(arg->getType());
+        builder_.CreateStore(arg, new_var);
         current_scope_->add_value(args.at(i).second, new_var);
     }
 
