@@ -34,10 +34,9 @@ target_compile_options(
     NEZOKU
     PRIVATE
     -ggdb3
-#    -Wall
-#    -Wextra
-#    -Wpedantic
-#    -Werror
+   -Wall
+   -Wextra
+   -Wpedantic
 )
 
 set_target_properties(
@@ -46,6 +45,6 @@ set_target_properties(
     OUTPUT_NAME nezoku
 )
 
-llvm_map_components_to_libnames(LLVM core executionengine)
+llvm_map_components_to_libnames(LLVM core)
 target_link_libraries(NEZOKU ${LLVM})
 

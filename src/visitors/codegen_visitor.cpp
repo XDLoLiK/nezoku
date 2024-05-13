@@ -79,7 +79,8 @@ void CodegenVisitor::visit(TranslationUnit* translation_unit) {
 }
 
 void CodegenVisitor::visit(Declaration* declaration) {
-    auto type = declaration->variable_type();
+    // TODO: Support more types.
+    [[maybe_unused]] auto type = declaration->variable_type();
     auto name = declaration->variable_name();
     llvm::Value* value = nullptr;
     auto init = declaration->initializer();
@@ -107,7 +108,7 @@ void CodegenVisitor::visit(FunctionDefinition* function_definition) {
     std::vector<llvm::Type*> arg_types;
     auto args = function_definition->parameter_list();
 
-    for (const auto& arg: args) {
+    for ([[maybe_unused]] const auto& arg: args) {
         // TODO: Support more types.
         auto arg_type = builder_.getInt32Ty();
         arg_types.push_back(arg_type);
