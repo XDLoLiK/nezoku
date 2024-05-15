@@ -75,7 +75,7 @@ private:
     llvm::BasicBlock* generate_block(const std::string& block_name);
 
 private:
-    std::vector<llvm::BasicBlock*> blocks_;
+    std::vector<llvm::BasicBlock*> blocks_{};
     llvm::LLVMContext context_{};
     llvm::IRBuilder<> builder_;
     std::unique_ptr<llvm::Module> module_;
@@ -84,8 +84,7 @@ private:
     llvm::BasicBlock* out_block_{nullptr};
     std::stack<llvm::Value*> latest_values_;
     std::shared_ptr<Scope<llvm::Value*>> current_scope_;
-    std::shared_ptr<Scope<llvm::Function*>> functions_;
-    std::shared_ptr<Scope<llvm::BasicBlock*>> jump_table_;
+    std::unordered_map<std::string, llvm::Function*> functions_{};
 };
 
 }; // namespace nezoku

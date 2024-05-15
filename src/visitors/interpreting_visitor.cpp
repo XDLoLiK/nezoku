@@ -71,11 +71,37 @@ void InterpretingVisitor::visit(BreakStatement* break_statement) {
 }
 
 void InterpretingVisitor::visit(SelectionStatement* selection_statement) {
-    // TODO: Unimplemented.
+    auto condition = selection_statement->if_expression();
+    condition->accept_visitor(this);
+    auto condition_value = latest_values_.top();
+    latest_values_.pop();
+
+    // TODO: Support more types.
+    auto is_true = std::any_cast<int>(condition_value);
+    auto if_body = selection_statement->then_statement();
+    auto else_body = selection_statement->else_statement();
+
+    if (is_true) {
+        if_body->accept_visitor(this);
+    } else if (else_body) {
+        else_body->accept_visitor(this);
+    }
 }
 
 void InterpretingVisitor::visit(IterationStatement* iteration_statement) {
-    // TODO: Unimplemented.
+    auto check_condition = [this, iteration_statement]() -> int {
+        auto condition = iteration_statement->condition();
+        condition->accept_visitor(this);
+        auto condition_value = latest_values_.top();
+        latest_values_.pop();
+        return std::any_cast<int>(condition_value);
+    };
+
+    while (check_condition()) {
+        auto body = iteration_statement->body();
+        body->accept_visitor(this);
+        // TODO: Support break and continue.
+    }
 }
 
 void InterpretingVisitor::visit(AssignmentExpression* assignment_expression) {
@@ -270,7 +296,6 @@ void InterpretingVisitor::visit(FunctionCallExpression* function_call_expression
 void InterpretingVisitor::visit(IdentifierExpression* identifier_expression) {
     auto name = identifier_expression->identifier();
     auto variable_opt = scope_find_value(name, current_scope_);
-    assert(variable_opt);
     auto variable = variable_opt.value();
     // TODO: Support more types.
     auto value = std::any_cast<int>(variable.second);

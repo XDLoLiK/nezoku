@@ -22,6 +22,7 @@ public:
     void trace_scanning(bool flag);
     void trace_parsing(bool flag);
     void translation_unit(TranslationUnit* translation_unit);
+
     [[nodiscard]]
     auto location() noexcept -> yy::location&;
 
@@ -33,12 +34,12 @@ public:
     void interpret(const std::string& filename);
 
 private:
+    Scanner scanner_;
+    yy::parser parser_;
     bool trace_scanning_{false};
     bool trace_parsing_{false};
     std::string file_{};
     std::ifstream stream_{};
-    Scanner scanner_;
-    yy::parser parser_;
     yy::location location_{};
     TranslationUnit* translation_unit_{nullptr};
 };

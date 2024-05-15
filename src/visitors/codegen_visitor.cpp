@@ -10,14 +10,10 @@ namespace nezoku {
 template<class... Ts> struct VariantVisitor: Ts... { using Ts::operator()...; };
 template<class... Ts> VariantVisitor(Ts...) -> VariantVisitor<Ts...>;
 
-// TODO: Mod name should be the same as file name.
 CodegenVisitor::CodegenVisitor(const std::string& mod_name)
     : builder_(context_)
     , module_(std::make_unique<llvm::Module>(mod_name, context_))
-    , current_scope_(std::make_shared<Scope<llvm::Value*>>("global"))
-    , functions_(std::make_shared<Scope<llvm::Function*>>("global"))
-    , jump_table_(std::make_shared<Scope<llvm::BasicBlock*>>("global")) {
-}
+    , current_scope_(std::make_shared<Scope<llvm::Value*>>("global")) {}
 
 std::error_code CodegenVisitor::write_to(const std::string& file_name) {
     std::error_code err;
@@ -45,46 +41,43 @@ void CodegenVisitor::visit(TranslationUnit* translation_unit) {
 
 void CodegenVisitor::visit(Declaration* declaration) {
     // TODO: Support more types.
-    [[maybe_unused]] auto type = declaration->variable_type();
-    auto name = declaration->variable_name();
-    llvm::Value* value = nullptr;
+    auto new_var = builder_.CreateAlloca(builder_.getInt32Ty());
+
+    // Compile initial value.
     auto init = declaration->initializer();
 
     if (init) {
         init->accept_visitor(this);
-        value = latest_values_.top();
-        assert(value);
+        auto value = latest_values_.top();
         latest_values_.pop();
+        builder_.CreateStore(value, new_var);
     }
 
-    // TODO: Support more types.
-    auto new_var = builder_.CreateAlloca(builder_.getInt32Ty());
-    builder_.CreateStore(value, new_var);
     latest_values_.push(new_var);
+    auto name = declaration->variable_name();
     current_scope_->add_value(name, new_var);
 }
 
 void CodegenVisitor::visit(FunctionDefinition* function_definition) {
-    auto func_name = function_definition->function_name();
     // Create a new scope for each function.
+    auto func_name = function_definition->function_name();
     current_scope_ = std::make_shared<Scope<llvm::Value*>>(func_name, current_scope_);
 
-    [[maybe_unused]] auto ret_type = function_definition->return_type();
     std::vector<llvm::Type*> arg_types;
     auto args = function_definition->parameter_list();
 
     for ([[maybe_unused]] const auto& arg: args) {
         // TODO: Support more types.
-        auto arg_type = builder_.getInt32Ty();
-        arg_types.push_back(arg_type);
+        arg_types.push_back(builder_.getInt32Ty());
     }
 
     llvm::ArrayRef<llvm::Type*> args_ref(arg_types);
     // TODO: Support more types.
     auto func_type = llvm::FunctionType::get(builder_.getInt32Ty(), args_ref, /* isVarArg */ false);
     current_function_ = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage, func_name, module_.get());
-    functions_->add_value(func_name, current_function_);
+    functions_.insert(std::make_pair(func_name, current_function_));
 
+    // Create entry block.
     auto entry = generate_block(func_name + ".entry");
     builder_.SetInsertPoint(entry);
 
@@ -92,30 +85,18 @@ void CodegenVisitor::visit(FunctionDefinition* function_definition) {
         auto arg = current_function_->getArg(i);
         auto new_var = builder_.CreateAlloca(arg->getType());
         builder_.CreateStore(arg, new_var);
-        current_scope_->add_value(args.at(i).second, new_var);
+        current_scope_->add_value(args[i].second, new_var);
     }
 
     auto body = function_definition->function_body();
     body->accept_visitor(this);
 
-    for (size_t i = 1; i < blocks_.size(); i++) {
-        auto block = blocks_[i - 1];
-        auto successor = blocks_[i];
-        auto terminator = block->getTerminator();
-
-        if (!terminator) {
-            builder_.SetInsertPoint(block);
-            builder_.CreateBr(successor);
-        }
-    }
-
-    blocks_.clear();
     // End of the function's scope.
     current_scope_ = current_scope_->parent();
 }
 
 void CodegenVisitor::visit(CompoundStatement* compound_statement) {
-    // Create a new scope for each compound statement.
+    // Create a new anonymous scope.
     current_scope_ = std::make_shared<Scope<llvm::Value*>>(current_scope_);
 
     for (const auto& block_item: compound_statement->block_item_list()) {
@@ -151,13 +132,13 @@ void CodegenVisitor::visit(ReturnStatement* return_statement) {
     }
 
     auto ret_value = latest_values_.top();
-    assert(ret_value);
     latest_values_.pop();
     builder_.CreateRet(ret_value);
 }
 
 void CodegenVisitor::visit([[maybe_unused]] ContinueStatement* continue_statement) {
     if (cond_block_) {
+        // TODO: Support dead code after continue;
         builder_.CreateBr(cond_block_);
     } else {
         // TODO: Throw error.
@@ -166,6 +147,7 @@ void CodegenVisitor::visit([[maybe_unused]] ContinueStatement* continue_statemen
 
 void CodegenVisitor::visit([[maybe_unused]] BreakStatement* break_statement) {
     if (out_block_) {
+        // TODO: Support dead code after break;
         builder_.CreateBr(out_block_);
     } else {
         // TODO: Throw error.
@@ -173,16 +155,18 @@ void CodegenVisitor::visit([[maybe_unused]] BreakStatement* break_statement) {
 }
 
 void CodegenVisitor::visit(SelectionStatement* selection_statement) {
+    // Create basic block for if operator parts.
     auto then_block = generate_block("if.true");
     llvm::BasicBlock* else_block = nullptr;
     auto out_block = generate_block("if.out");
 
+    // Compile selection condition.
     auto condition = selection_statement->if_expression();
     condition->accept_visitor(this);
     auto condition_value = latest_values_.top();
-    assert(condition_value);
     latest_values_.pop();
 
+    auto if_body = selection_statement->then_statement();
     auto else_body = selection_statement->else_statement();
 
     if (else_body) {
@@ -192,42 +176,61 @@ void CodegenVisitor::visit(SelectionStatement* selection_statement) {
         builder_.CreateCondBr(condition_value, then_block, out_block);
     }
 
-    builder_.SetInsertPoint(then_block);
-    auto if_body = selection_statement->then_statement();
-    if_body->accept_visitor(this);
+    // Compile main branch.
+    auto br_out = [this, out_block](llvm::BasicBlock* src_block) {
+        // TODO: Support empty out blocks.
+        if (!src_block->getTerminator() && !out_block->empty()) {
+            builder_.SetInsertPoint(src_block);
+            builder_.CreateBr(out_block);
+        }
+    };
 
+    builder_.SetInsertPoint(then_block);
+    if_body->accept_visitor(this);
+    br_out(then_block);
+
+    // Compile alternative branch.
     if (else_body) {
         builder_.SetInsertPoint(else_block);
         else_body->accept_visitor(this);
+        br_out(else_block);
     }
 
+    // Go out from the selection statement.
     builder_.SetInsertPoint(out_block);
 }
 
 void CodegenVisitor::visit(IterationStatement* iteration_statement) {
+    // Create basic block for cycle parts.
     auto cond_block = generate_block("while.condition");
     auto iter_block = generate_block("while.body");
     auto out_block = generate_block("while.out");
+    builder_.CreateBr(cond_block);
 
+    // Save previous iteration frame.
+    auto prev_cond = cond_block_;
+    auto prev_out = out_block_;
     cond_block_ = cond_block;
     out_block_ = out_block;
 
+    // Compile cycle condition.
     builder_.SetInsertPoint(cond_block);
     auto condition = iteration_statement->condition();
     condition->accept_visitor(this);
     auto condition_value = latest_values_.top();
-    assert(condition_value);
     latest_values_.pop();
     builder_.CreateCondBr(condition_value, iter_block, out_block);
 
+    // Compile cycle body.
     builder_.SetInsertPoint(iter_block);
     auto body = iteration_statement->body();
     body->accept_visitor(this);
     builder_.CreateBr(cond_block);
 
+    // Reset iteration frame.
     builder_.SetInsertPoint(out_block);
-    cond_block_ = nullptr;
-    out_block_ = nullptr;
+    cond_block_ = prev_cond;
+    out_block_ = prev_out;
 }
 
 void CodegenVisitor::visit(AssignmentExpression* assignment_expression) {
@@ -251,13 +254,13 @@ void CodegenVisitor::visit(AssignmentExpression* assignment_expression) {
     auto right_expr = assignment_expression->right_expression();
     right_expr->accept_visitor(this);
     auto value = latest_values_.top();
-    assert(value);
     latest_values_.pop();
 
     auto variable = variable_opt.value();
     // TODO: Support different assignment operations.
     builder_.CreateStore(value, variable);
-    auto new_value = builder_.CreateLoad(variable->getType(), variable);
+    // TODO: Support more types.
+    auto new_value = builder_.CreateLoad(builder_.getInt32Ty(), variable);
     // TODO: Detect and discard (pop) unused expressions.
     latest_values_.push(new_value);
 }
@@ -410,10 +413,10 @@ void CodegenVisitor::visit(FunctionCallExpression* function_call_expression) {
 
     auto args_ref = llvm::ArrayRef<llvm::Value*>(args);
     auto name = id_expr->identifier();
-    auto found_func_opt = scope_find_value(name, functions_);
+    auto found_func = functions_.find(name);
 
     // TODO: Clean the code here.
-    if (!found_func_opt) {
+    if (found_func == functions_.end()) {
         if (name == "printf") {
             auto func_callee = get_printf();
             auto ret_value = builder_.CreateCall(func_callee, args_ref);
@@ -427,8 +430,7 @@ void CodegenVisitor::visit(FunctionCallExpression* function_call_expression) {
             return;
         }
     } else {
-        auto found_func = found_func_opt.value();
-        auto func_type = found_func->getFunctionType();
+        auto func_type = found_func->second->getFunctionType();
         auto func_callee = module_->getOrInsertFunction(name, func_type);
         auto ret_value = builder_.CreateCall(func_callee, args_ref);
         latest_values_.push(ret_value);
@@ -455,7 +457,11 @@ void CodegenVisitor::visit(ConstantExpression* constant_expression) {
 
 void CodegenVisitor::visit(StringExpression* string_expression) {
     auto str = string_expression->string();
-    auto value = builder_.CreateGlobalStringPtr(str);
+    // TODO: Handle excessive quotation marks smoother.
+    str.erase(0, 1);
+    str.pop_back();
+    // TODO: Add support for escape sequences.
+    auto value = builder_.CreateGlobalStringPtr(str + "\n");
     latest_values_.push(value);
 }
 
@@ -482,7 +488,6 @@ void CodegenVisitor::visit_binary_op(T* binary_op, BinaryOp op_func) {
     auto visit_expr = [this](Expression* expr) -> llvm::Value* {
         expr->accept_visitor(this);
         auto value = latest_values_.top();
-        assert(value);
         latest_values_.pop();
         return value;
     };

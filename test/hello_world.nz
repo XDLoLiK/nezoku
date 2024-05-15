@@ -1,5 +1,5 @@
-i32 main(u32 argc) {
-    "Hello, World!\n";
+i32 main() {
+    printf("Hello, World!");
     return 0;
 }
 
