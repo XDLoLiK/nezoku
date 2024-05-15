@@ -179,7 +179,7 @@ void CodegenVisitor::visit(SelectionStatement* selection_statement) {
     // Compile main branch.
     auto br_out = [this, out_block](llvm::BasicBlock* src_block) {
         // TODO: Support empty out blocks.
-        if (!src_block->getTerminator() && !out_block->empty()) {
+        if (!src_block->getTerminator()) {
             builder_.SetInsertPoint(src_block);
             builder_.CreateBr(out_block);
         }
