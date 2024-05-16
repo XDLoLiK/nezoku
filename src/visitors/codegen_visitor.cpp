@@ -53,7 +53,6 @@ void CodegenVisitor::visit(Declaration* declaration) {
         builder_.CreateStore(value, new_var);
     }
 
-    latest_values_.push(new_var);
     auto name = declaration->variable_name();
     current_scope_->add_value(name, new_var);
 }

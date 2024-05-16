@@ -31,7 +31,7 @@ public:
     }
 
     void add_value(const std::string& name, V value) {
-        values_.insert(std::make_pair(name, value));
+        values_.insert_or_assign(name, value);
     }
 
     std::optional<V> get_value(const std::string& name) {

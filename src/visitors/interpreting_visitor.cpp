@@ -1,3 +1,5 @@
+#include <exception>
+
 #include "interpreting_visitor.hpp"
 #include "ast/translation_unit.hpp"
 #include "ast/function_definition.hpp"
@@ -9,6 +11,27 @@ namespace nezoku {
 
 template<class... Ts> struct VariantVisitor: Ts... { using Ts::operator()...; };
 template<class... Ts> VariantVisitor(Ts...) -> VariantVisitor<Ts...>;
+
+class BreakException: public std::exception {
+public:
+    const char* what() const throw() {
+        return "Break";
+    }
+};
+
+class ContinueException: public std::exception {
+public:
+    const char* what() const throw() {
+        return "Continue";
+    }
+};
+
+class ReturnException: public std::exception {
+public:
+    const char* what() const throw() {
+        return "Return";
+    }
+};
 
 InterpretingVisitor::InterpretingVisitor(std::ostream& stream)
     : stream_(stream) {}
@@ -25,11 +48,23 @@ void InterpretingVisitor::visit(TranslationUnit* translation_unit) {
     }
 }
 void InterpretingVisitor::visit(FunctionDefinition* function_definition) {
-    // TODO: Unimplemented.
+    auto name = function_definition->function_name();
+    functions_->add_value(name, function_definition);
 }
 
 void InterpretingVisitor::visit(Declaration* declaration) {
-    // TODO: Unimplemented.
+    auto init_expr = declaration->initializer();
+    // TODO: Support more types
+    auto init_val = std::make_pair(TypeSpecifier::I32Type, std::any(0));
+
+    if (init_expr) {
+        init_expr->accept_visitor(this);
+        init_val = latest_values_.top();
+        latest_values_.pop();
+    }
+    
+    auto name = declaration->variable_name();
+    current_scope_->add_value(name, init_val);
 }
 
 void InterpretingVisitor::visit(CompoundStatement* compound_statement) {
@@ -59,15 +94,21 @@ void InterpretingVisitor::visit(ExpressionStatement* expression_statement) {
 }
 
 void InterpretingVisitor::visit(ReturnStatement* return_statement) {
-    // TODO: Unimplemented.
+    auto ret_expr = return_statement->expression();
+
+    if (ret_expr) {
+        ret_expr->accept_visitor(this);
+    }
+
+    throw ReturnException();
 }
 
-void InterpretingVisitor::visit(ContinueStatement* continue_statement) {
-    // TODO: Unimplemented.
+void InterpretingVisitor::visit([[maybe_unused]] ContinueStatement* continue_statement) {
+    throw ContinueException();
 }
 
-void InterpretingVisitor::visit(BreakStatement* break_statement) {
-    // TODO: Unimplemented.
+void InterpretingVisitor::visit([[maybe_unused]] BreakStatement* break_statement) {
+    throw BreakException();
 }
 
 void InterpretingVisitor::visit(SelectionStatement* selection_statement) {
@@ -98,14 +139,46 @@ void InterpretingVisitor::visit(IterationStatement* iteration_statement) {
     };
 
     while (check_condition()) {
-        auto body = iteration_statement->body();
-        body->accept_visitor(this);
-        // TODO: Support break and continue.
+        try {
+            auto body = iteration_statement->body();
+            body->accept_visitor(this);
+        } catch (const BreakException& break_e) {
+            break;
+        } catch (const ContinueException& continue_e) {
+            continue;
+        }
     }
 }
 
 void InterpretingVisitor::visit(AssignmentExpression* assignment_expression) {
-    // TODO: Unimplemented.
+    auto left_expr = assignment_expression->left_expression();
+    auto id_expr = dynamic_cast<IdentifierExpression*>(left_expr);
+
+    // Type checking for the left side to be an lvalue.
+    if (!id_expr) {
+        // TODO: Throw error.
+        return;
+    }
+
+    auto name = id_expr->identifier();
+    auto variable_opt = scope_find_value(name, current_scope_);
+
+    if (!variable_opt) {
+        // TODO: Throw error.
+        return;
+    }
+
+    auto variable = variable_opt.value();
+    // TODO: Support more types.
+    assert(variable.first == TypeSpecifier::I32Type);
+
+    auto right_expr = assignment_expression->right_expression();
+    right_expr->accept_visitor(this);
+    auto new_val = latest_values_.top();
+    latest_values_.pop();
+    // TODO: Support different assignment operations.
+    current_scope_->add_value(name, new_val);
+    latest_values_.push(new_val);
 }
 
 void InterpretingVisitor::visit(LorExpression* logical_or_expression) {
@@ -296,6 +369,7 @@ void InterpretingVisitor::visit(FunctionCallExpression* function_call_expression
 void InterpretingVisitor::visit(IdentifierExpression* identifier_expression) {
     auto name = identifier_expression->identifier();
     auto variable_opt = scope_find_value(name, current_scope_);
+    assert(variable_opt);
     auto variable = variable_opt.value();
     // TODO: Support more types.
     auto value = std::any_cast<int>(variable.second);
@@ -310,7 +384,10 @@ void InterpretingVisitor::visit(ConstantExpression* constant_expression) {
 }
 
 void InterpretingVisitor::visit(StringExpression* string_expression) {
-    // TODO: Implement.
+    // TODO: Support pointers and composite types.
+    auto str = string_expression->string();
+    auto new_val = std::make_pair(TypeSpecifier::CharType, std::any(str));
+    latest_values_.push(new_val);
 }
 
 template<class T>
