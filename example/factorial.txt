@@ -1,0 +1,48 @@
+[function]: i32 factorial
+	[params]:
+		i32 num
+	[body]:
+		[branch]:
+			[if]:
+				[op]: ==
+					[id]: num
+					[const]: 0
+			[then]:
+				[op]: return
+					[const]: 1
+			[else]:
+		[op]: return
+			[op]: *
+				[id]: num
+				[function call]:
+					[function]:
+						[id]: factorial
+					[args]:
+						[op]: -
+							[id]: num
+							[const]: 1
+[function]: i32 main
+	[params]:
+	[body]:
+		[variable]:
+			[type]: i32
+			[id]: num
+			[init]:
+				[const]: 5
+			[variable]:
+				[type]: i32
+				[id]: num_fact
+				[init]:
+					[function call]:
+						[function]:
+							[id]: factorial
+						[args]:
+							[id]: num
+				[function call]:
+					[function]:
+						[id]: printf
+					[args]:
+						[string]: "%d"
+						[id]: num_fact
+				[op]: return
+					[const]: 0

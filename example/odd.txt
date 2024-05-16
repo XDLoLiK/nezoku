@@ -1,0 +1,37 @@
+[function]: i32 main
+	[params]:
+	[body]:
+		[variable]:
+			[type]: i32
+			[id]: i
+			[init]:
+				[const]: 0
+			[loop]:
+				[cond]:
+					[op]: <
+						[id]: i
+						[const]: 10
+				[body]:
+					[op]:=
+						[id]: i
+						[op]: +
+							[id]: i
+							[const]: 1
+					[branch]:
+						[if]:
+							[op]: ==
+								[op]: %
+									[id]: i
+									[const]: 2
+								[const]: 0
+						[then]:
+							[op]: continue
+						[else]:
+					[function call]:
+						[function]:
+							[id]: printf
+						[args]:
+							[string]: "%d"
+							[id]: i
+			[op]: return
+				[const]: 0
