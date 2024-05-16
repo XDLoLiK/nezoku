@@ -1,0 +1,10 @@
+[function]: i32 main
+	[params]:
+	[body]:
+		[function call]:
+			[function]:
+				[id]: printf
+			[args]:
+				[string]: "Hello, World!"
+		[op]: return
+			[const]: 0

@@ -1,0 +1,93 @@
+[function]: i32 main
+	[params]:
+		i32 argc
+	[body]:
+		[variable]:
+			[type]: i32
+			[id]: i
+			[init]:
+				[const]: 0
+			[variable]:
+				[type]: i32
+				[id]: j
+				[init]:
+				[loop]:
+					[cond]:
+						[op]: <
+							[id]: i
+							[const]: 100
+					[body]:
+						[op]:=
+							[id]: i
+							[op]: +
+								[id]: i
+								[const]: 1
+						[op]:=
+							[id]: j
+							[const]: 3
+						[branch]:
+							[if]:
+								[op]: ==
+									[op]: %
+										[id]: i
+										[const]: 2
+									[const]: 0
+							[then]:
+								[function call]:
+									[function]:
+										[id]: printf
+									[args]:
+										[string]: "%d is not prime"
+										[id]: i
+								[op]: continue
+							[else]:
+						[variable]:
+							[type]: i32
+							[id]: is_prime
+							[init]:
+								[const]: 1
+							[loop]:
+								[cond]:
+									[op]: <
+										[id]: j
+										[id]: i
+								[body]:
+									[branch]:
+										[if]:
+											[op]: ==
+												[op]: %
+													[id]: i
+													[id]: j
+												[const]: 0
+										[then]:
+											[op]:=
+												[id]: is_prime
+												[const]: 0
+											[op]: break
+										[else]:
+									[op]:=
+										[id]: j
+										[op]: +
+											[id]: j
+											[const]: 1
+							[branch]:
+								[if]:
+									[op]: ==
+										[id]: is_prime
+										[const]: 1
+								[then]:
+									[function call]:
+										[function]:
+											[id]: printf
+										[args]:
+											[string]: "%d is prime"
+											[id]: i
+								[else]:
+									[function call]:
+										[function]:
+											[id]: printf
+										[args]:
+											[string]: "%d is not prime"
+											[id]: i
+					[op]: return
+						[const]: 0
