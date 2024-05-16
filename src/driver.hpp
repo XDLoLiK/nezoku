@@ -30,8 +30,8 @@ public:
     void scan_end();
 
     void print_tree(const std::string& filename);
-    void compile(const std::string& filename);
     void interpret(const std::string& filename);
+    void compile(const std::string& filename);
 
 private:
     Scanner scanner_;

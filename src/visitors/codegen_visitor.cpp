@@ -50,6 +50,8 @@ void CodegenVisitor::visit(Declaration* declaration) {
         init->accept_visitor(this);
         auto value = latest_values_.top();
         latest_values_.pop();
+        // TODO: Support more types.
+        assert(value->getType() == builder_.getInt32Ty());
         builder_.CreateStore(value, new_var);
     }
 
@@ -164,6 +166,7 @@ void CodegenVisitor::visit(SelectionStatement* selection_statement) {
     condition->accept_visitor(this);
     auto condition_value = latest_values_.top();
     latest_values_.pop();
+    assert(condition_value->getType() == builder_.getInt1Ty());
 
     auto if_body = selection_statement->then_statement();
     auto else_body = selection_statement->else_statement();
@@ -218,6 +221,7 @@ void CodegenVisitor::visit(IterationStatement* iteration_statement) {
     condition->accept_visitor(this);
     auto condition_value = latest_values_.top();
     latest_values_.pop();
+    assert(condition_value->getType() == builder_.getInt1Ty());
     builder_.CreateCondBr(condition_value, iter_block, out_block);
 
     // Compile cycle body.
@@ -266,6 +270,7 @@ void CodegenVisitor::visit(AssignmentExpression* assignment_expression) {
 
 void CodegenVisitor::visit(LorExpression* logical_or_expression) {
     auto call = [this](llvm::Value* lhs, llvm::Value* rhs) -> llvm::Value* {
+        assert(lhs->getType() == builder_.getInt32Ty() && rhs->getType() == builder_.getInt32Ty());
         return builder_.CreateLogicalOr(lhs, rhs);
     };
     visit_binary_op(logical_or_expression, call);
@@ -273,6 +278,7 @@ void CodegenVisitor::visit(LorExpression* logical_or_expression) {
 
 void CodegenVisitor::visit(LandExpression* logical_and_expression) {
     auto call = [this](llvm::Value* lhs, llvm::Value* rhs) -> llvm::Value* {
+        assert(lhs->getType() == builder_.getInt32Ty() && rhs->getType() == builder_.getInt32Ty());
         return builder_.CreateLogicalAnd(lhs, rhs);
     };
     visit_binary_op(logical_and_expression, call);
@@ -280,6 +286,7 @@ void CodegenVisitor::visit(LandExpression* logical_and_expression) {
 
 void CodegenVisitor::visit(OrExpression* inclusive_or_expression) {
     auto call = [this](llvm::Value* lhs, llvm::Value* rhs) -> llvm::Value* {
+        assert(lhs->getType() == builder_.getInt32Ty() && rhs->getType() == builder_.getInt32Ty());
         return builder_.CreateOr(lhs, rhs);
     };
     visit_binary_op(inclusive_or_expression, call);
@@ -287,6 +294,7 @@ void CodegenVisitor::visit(OrExpression* inclusive_or_expression) {
 
 void CodegenVisitor::visit(XorExpression* exclusive_or_expression) {
     auto call = [this](llvm::Value* lhs, llvm::Value* rhs) -> llvm::Value* {
+        assert(lhs->getType() == builder_.getInt32Ty() && rhs->getType() == builder_.getInt32Ty());
         return builder_.CreateXor(lhs, rhs);
     };
     visit_binary_op(exclusive_or_expression, call);
@@ -294,6 +302,7 @@ void CodegenVisitor::visit(XorExpression* exclusive_or_expression) {
 
 void CodegenVisitor::visit(AndExpression* and_expression) {
     auto call = [this](llvm::Value* lhs, llvm::Value* rhs) -> llvm::Value* {
+        assert(lhs->getType() == builder_.getInt32Ty() && rhs->getType() == builder_.getInt32Ty());
         return builder_.CreateAnd(lhs, rhs);
     };
     visit_binary_op(and_expression, call);
@@ -301,6 +310,7 @@ void CodegenVisitor::visit(AndExpression* and_expression) {
 
 void CodegenVisitor::visit(EqExpression* eq_expression) {
     auto call = [this](llvm::Value* lhs, llvm::Value* rhs) -> llvm::Value* {
+        assert(lhs->getType() == builder_.getInt32Ty() && rhs->getType() == builder_.getInt32Ty());
         return builder_.CreateICmpEQ(lhs, rhs);
     };
     visit_binary_op(eq_expression, call);
@@ -308,6 +318,7 @@ void CodegenVisitor::visit(EqExpression* eq_expression) {
 
 void CodegenVisitor::visit(NeqExpression* neq_expression) {
     auto call = [this](llvm::Value* lhs, llvm::Value* rhs) -> llvm::Value* {
+        assert(lhs->getType() == builder_.getInt32Ty() && rhs->getType() == builder_.getInt32Ty());
         return builder_.CreateICmpNE(lhs, rhs);
     };
     visit_binary_op(neq_expression, call);
@@ -315,6 +326,7 @@ void CodegenVisitor::visit(NeqExpression* neq_expression) {
 
 void CodegenVisitor::visit(LessExpression* less_expression) {
     auto call = [this](llvm::Value* lhs, llvm::Value* rhs) -> llvm::Value* {
+        assert(lhs->getType() == builder_.getInt32Ty() && rhs->getType() == builder_.getInt32Ty());
         return builder_.CreateICmpSLT(lhs, rhs);
     };
     visit_binary_op(less_expression, call);
@@ -322,6 +334,7 @@ void CodegenVisitor::visit(LessExpression* less_expression) {
 
 void CodegenVisitor::visit(GreaterExpression* greater_expression) {
     auto call = [this](llvm::Value* lhs, llvm::Value* rhs) -> llvm::Value* {
+        assert(lhs->getType() == builder_.getInt32Ty() && rhs->getType() == builder_.getInt32Ty());
         return builder_.CreateICmpSGT(lhs, rhs);
     };
     visit_binary_op(greater_expression, call);
@@ -329,6 +342,7 @@ void CodegenVisitor::visit(GreaterExpression* greater_expression) {
 
 void CodegenVisitor::visit(LeqExpression* leq_expression) {
     auto call = [this](llvm::Value* lhs, llvm::Value* rhs) -> llvm::Value* {
+        assert(lhs->getType() == builder_.getInt32Ty() && rhs->getType() == builder_.getInt32Ty());
         return builder_.CreateICmpSLE(lhs, rhs);
     };
     visit_binary_op(leq_expression, call);
@@ -336,6 +350,7 @@ void CodegenVisitor::visit(LeqExpression* leq_expression) {
 
 void CodegenVisitor::visit(GeqExpression* geq_expression) {
     auto call = [this](llvm::Value* lhs, llvm::Value* rhs) -> llvm::Value* {
+        assert(lhs->getType() == builder_.getInt32Ty() && rhs->getType() == builder_.getInt32Ty());
         return builder_.CreateICmpSGE(lhs, rhs);
     };
     visit_binary_op(geq_expression, call);
@@ -343,6 +358,7 @@ void CodegenVisitor::visit(GeqExpression* geq_expression) {
 
 void CodegenVisitor::visit(ShlExpression* shl_expression) {
     auto call = [this](llvm::Value* lhs, llvm::Value* rhs) -> llvm::Value* {
+        assert(lhs->getType() == builder_.getInt32Ty() && rhs->getType() == builder_.getInt32Ty());
         return builder_.CreateShl(lhs, rhs);
     };
     visit_binary_op(shl_expression, call);
@@ -350,6 +366,7 @@ void CodegenVisitor::visit(ShlExpression* shl_expression) {
 
 void CodegenVisitor::visit(ShrExpression* shr_expression) {
     auto call = [this](llvm::Value* lhs, llvm::Value* rhs) -> llvm::Value* {
+        assert(lhs->getType() == builder_.getInt32Ty() && rhs->getType() == builder_.getInt32Ty());
         return builder_.CreateLShr(lhs, rhs);
     };
     visit_binary_op(shr_expression, call);
@@ -357,6 +374,7 @@ void CodegenVisitor::visit(ShrExpression* shr_expression) {
 
 void CodegenVisitor::visit(AddExpression* add_expression) {
     auto call = [this](llvm::Value* lhs, llvm::Value* rhs) -> llvm::Value* {
+        assert(lhs->getType() == builder_.getInt32Ty() && rhs->getType() == builder_.getInt32Ty());
         return builder_.CreateAdd(lhs, rhs);
     };
     visit_binary_op(add_expression, call);
@@ -364,6 +382,7 @@ void CodegenVisitor::visit(AddExpression* add_expression) {
 
 void CodegenVisitor::visit(SubExpression* sub_expression) {
     auto call = [this](llvm::Value* lhs, llvm::Value* rhs) -> llvm::Value* {
+        assert(lhs->getType() == builder_.getInt32Ty() && rhs->getType() == builder_.getInt32Ty());
         return builder_.CreateSub(lhs, rhs);
     };
     visit_binary_op(sub_expression, call);
@@ -371,6 +390,7 @@ void CodegenVisitor::visit(SubExpression* sub_expression) {
 
 void CodegenVisitor::visit(MulExpression* mul_expression) {
     auto call = [this](llvm::Value* lhs, llvm::Value* rhs) -> llvm::Value* {
+        assert(lhs->getType() == builder_.getInt32Ty() && rhs->getType() == builder_.getInt32Ty());
         return builder_.CreateMul(lhs, rhs);
     };
     visit_binary_op(mul_expression, call);
@@ -378,6 +398,7 @@ void CodegenVisitor::visit(MulExpression* mul_expression) {
 
 void CodegenVisitor::visit(DivExpression* div_expression) {
     auto call = [this](llvm::Value* lhs, llvm::Value* rhs) -> llvm::Value* {
+        assert(lhs->getType() == builder_.getInt32Ty() && rhs->getType() == builder_.getInt32Ty());
         return builder_.CreateSDiv(lhs, rhs);
     };
     visit_binary_op(div_expression, call);
@@ -385,6 +406,7 @@ void CodegenVisitor::visit(DivExpression* div_expression) {
 
 void CodegenVisitor::visit(ModExpression* mod_expression) {
     auto call = [this](llvm::Value* lhs, llvm::Value* rhs) -> llvm::Value* {
+        assert(lhs->getType() == builder_.getInt32Ty() && rhs->getType() == builder_.getInt32Ty());
         return builder_.CreateSRem(lhs, rhs);
     };
     visit_binary_op(mod_expression, call);
@@ -406,8 +428,9 @@ void CodegenVisitor::visit(FunctionCallExpression* function_call_expression) {
 
     for (const auto& arg : arg_list) {
         arg->accept_visitor(this);
-        args.push_back(latest_values_.top());
+        auto arg_val = latest_values_.top();
         latest_values_.pop();
+        args.push_back(arg_val);
     }
 
     auto args_ref = llvm::ArrayRef<llvm::Value*>(args);

@@ -33,8 +33,8 @@ public:
     }
 };
 
-InterpretingVisitor::InterpretingVisitor(std::ostream& stream)
-    : stream_(stream) {}
+InterpretingVisitor::InterpretingVisitor(const std::string& file_name)
+    : file_name_(file_name) {}
 
 void InterpretingVisitor::visit(TranslationUnit* translation_unit) {
     for (const auto& external_declaration: translation_unit->external_declarations()) {
@@ -49,20 +49,21 @@ void InterpretingVisitor::visit(TranslationUnit* translation_unit) {
 }
 void InterpretingVisitor::visit(FunctionDefinition* function_definition) {
     auto name = function_definition->function_name();
-    functions_->add_value(name, function_definition);
+    functions_.insert(std::make_pair(name, function_definition));
 }
 
 void InterpretingVisitor::visit(Declaration* declaration) {
     auto init_expr = declaration->initializer();
-    // TODO: Support more types
     auto init_val = std::make_pair(TypeSpecifier::I32Type, std::any(0));
 
     if (init_expr) {
         init_expr->accept_visitor(this);
         init_val = latest_values_.top();
         latest_values_.pop();
+        // TODO: Support more types
+        assert(init_val.first == declaration->variable_type());
     }
-    
+
     auto name = declaration->variable_name();
     current_scope_->add_value(name, init_val);
 }
@@ -118,7 +119,8 @@ void InterpretingVisitor::visit(SelectionStatement* selection_statement) {
     latest_values_.pop();
 
     // TODO: Support more types.
-    auto is_true = std::any_cast<int>(condition_value);
+    auto real_val = std::any_cast<int>(condition_value);
+    auto is_true = static_cast<bool>(real_val);
     auto if_body = selection_statement->then_statement();
     auto else_body = selection_statement->else_statement();
 
@@ -135,7 +137,8 @@ void InterpretingVisitor::visit(IterationStatement* iteration_statement) {
         condition->accept_visitor(this);
         auto condition_value = latest_values_.top();
         latest_values_.pop();
-        return std::any_cast<int>(condition_value);
+        auto real_val = std::any_cast<int>(condition_value);
+        return static_cast<bool>(real_val);
     };
 
     while (check_condition()) {
@@ -169,13 +172,14 @@ void InterpretingVisitor::visit(AssignmentExpression* assignment_expression) {
     }
 
     auto variable = variable_opt.value();
-    // TODO: Support more types.
-    assert(variable.first == TypeSpecifier::I32Type);
-
     auto right_expr = assignment_expression->right_expression();
     right_expr->accept_visitor(this);
     auto new_val = latest_values_.top();
     latest_values_.pop();
+
+    // TODO: Support more types.
+    assert(variable.first == new_val.first);
+
     // TODO: Support different assignment operations.
     current_scope_->add_value(name, new_val);
     latest_values_.push(new_val);
@@ -184,8 +188,12 @@ void InterpretingVisitor::visit(AssignmentExpression* assignment_expression) {
 void InterpretingVisitor::visit(LorExpression* logical_or_expression) {
     auto call = [](Value lhs, Value rhs) -> Value {
         // TODO: Support more types.
-        auto lval = std::any_cast<int>(lhs.second);
-        auto rval = std::any_cast<int>(rhs.second);
+        auto extract_val = [](Value var) -> int {
+            assert(var.first == TypeSpecifier::BoolType || var.first == TypeSpecifier::I32Type);
+            return std::any_cast<int>(var.second);
+        };
+        auto lval = extract_val(lhs);
+        auto rval = extract_val(rhs);
         return std::make_pair(TypeSpecifier::I32Type, std::any(lval || rval));
     };
     visit_binary_op(logical_or_expression, call);
@@ -194,8 +202,12 @@ void InterpretingVisitor::visit(LorExpression* logical_or_expression) {
 void InterpretingVisitor::visit(LandExpression* logical_and_expression) {
     auto call = [](Value lhs, Value rhs) -> Value {
         // TODO: Support more types.
-        auto lval = std::any_cast<int>(lhs.second);
-        auto rval = std::any_cast<int>(rhs.second);
+        auto extract_val = [](Value var) -> int {
+            assert(var.first == TypeSpecifier::BoolType || var.first == TypeSpecifier::I32Type);
+            return std::any_cast<int>(var.second);
+        };
+        auto lval = extract_val(lhs);
+        auto rval = extract_val(rhs);
         return std::make_pair(TypeSpecifier::I32Type, std::any(lval && rval));
     };
     visit_binary_op(logical_and_expression, call);
@@ -204,8 +216,12 @@ void InterpretingVisitor::visit(LandExpression* logical_and_expression) {
 void InterpretingVisitor::visit(OrExpression* inclusive_or_expression) {
     auto call = [](Value lhs, Value rhs) -> Value {
         // TODO: Support more types.
-        auto lval = std::any_cast<int>(lhs.second);
-        auto rval = std::any_cast<int>(rhs.second);
+        auto extract_val = [](Value var) -> int {
+            assert(var.first == TypeSpecifier::BoolType || var.first == TypeSpecifier::I32Type);
+            return std::any_cast<int>(var.second);
+        };
+        auto lval = extract_val(lhs);
+        auto rval = extract_val(rhs);
         return std::make_pair(TypeSpecifier::I32Type, std::any(lval | rval));
     };
     visit_binary_op(inclusive_or_expression, call);
@@ -214,8 +230,12 @@ void InterpretingVisitor::visit(OrExpression* inclusive_or_expression) {
 void InterpretingVisitor::visit(XorExpression* exclusive_or_expression) {
     auto call = [](Value lhs, Value rhs) -> Value {
         // TODO: Support more types.
-        auto lval = std::any_cast<int>(lhs.second);
-        auto rval = std::any_cast<int>(rhs.second);
+        auto extract_val = [](Value var) -> int {
+            assert(var.first == TypeSpecifier::BoolType || var.first == TypeSpecifier::I32Type);
+            return std::any_cast<int>(var.second);
+        };
+        auto lval = extract_val(lhs);
+        auto rval = extract_val(rhs);
         return std::make_pair(TypeSpecifier::I32Type, std::any(lval ^ rval));
     };
     visit_binary_op(exclusive_or_expression, call);
@@ -224,8 +244,12 @@ void InterpretingVisitor::visit(XorExpression* exclusive_or_expression) {
 void InterpretingVisitor::visit(AndExpression* and_expression) {
     auto call = [](Value lhs, Value rhs) -> Value {
         // TODO: Support more types.
-        auto lval = std::any_cast<int>(lhs.second);
-        auto rval = std::any_cast<int>(rhs.second);
+        auto extract_val = [](Value var) -> int {
+            assert(var.first == TypeSpecifier::BoolType || var.first == TypeSpecifier::I32Type);
+            return std::any_cast<int>(var.second);
+        };
+        auto lval = extract_val(lhs);
+        auto rval = extract_val(rhs);
         return std::make_pair(TypeSpecifier::I32Type, std::any(lval & rval));
     };
     visit_binary_op(and_expression, call);
@@ -234,8 +258,12 @@ void InterpretingVisitor::visit(AndExpression* and_expression) {
 void InterpretingVisitor::visit(EqExpression* eq_expression) {
     auto call = [](Value lhs, Value rhs) -> Value {
         // TODO: Support more types.
-        auto lval = std::any_cast<int>(lhs.second);
-        auto rval = std::any_cast<int>(rhs.second);
+        auto extract_val = [](Value var) -> int {
+            assert(var.first == TypeSpecifier::BoolType || var.first == TypeSpecifier::I32Type);
+            return std::any_cast<int>(var.second);
+        };
+        auto lval = extract_val(lhs);
+        auto rval = extract_val(rhs);
         return std::make_pair(TypeSpecifier::I32Type, std::any(lval == rval));
     };
     visit_binary_op(eq_expression, call);
@@ -244,8 +272,12 @@ void InterpretingVisitor::visit(EqExpression* eq_expression) {
 void InterpretingVisitor::visit(NeqExpression* neq_expression) {
     auto call = [](Value lhs, Value rhs) -> Value {
         // TODO: Support more types.
-        auto lval = std::any_cast<int>(lhs.second);
-        auto rval = std::any_cast<int>(rhs.second);
+        auto extract_val = [](Value var) -> int {
+            assert(var.first == TypeSpecifier::BoolType || var.first == TypeSpecifier::I32Type);
+            return std::any_cast<int>(var.second);
+        };
+        auto lval = extract_val(lhs);
+        auto rval = extract_val(rhs);
         return std::make_pair(TypeSpecifier::I32Type, std::any(lval != rval));
     };
     visit_binary_op(neq_expression, call);
@@ -254,8 +286,12 @@ void InterpretingVisitor::visit(NeqExpression* neq_expression) {
 void InterpretingVisitor::visit(LessExpression* less_expression) {
     auto call = [](Value lhs, Value rhs) -> Value {
         // TODO: Support more types.
-        auto lval = std::any_cast<int>(lhs.second);
-        auto rval = std::any_cast<int>(rhs.second);
+        auto extract_val = [](Value var) -> int {
+            assert(var.first == TypeSpecifier::BoolType || var.first == TypeSpecifier::I32Type);
+            return std::any_cast<int>(var.second);
+        };
+        auto lval = extract_val(lhs);
+        auto rval = extract_val(rhs);
         return std::make_pair(TypeSpecifier::I32Type, std::any(lval < rval));
     };
     visit_binary_op(less_expression, call);
@@ -264,8 +300,12 @@ void InterpretingVisitor::visit(LessExpression* less_expression) {
 void InterpretingVisitor::visit(GreaterExpression* greater_expression) {
     auto call = [](Value lhs, Value rhs) -> Value {
         // TODO: Support more types.
-        auto lval = std::any_cast<int>(lhs.second);
-        auto rval = std::any_cast<int>(rhs.second);
+        auto extract_val = [](Value var) -> int {
+            assert(var.first == TypeSpecifier::BoolType || var.first == TypeSpecifier::I32Type);
+            return std::any_cast<int>(var.second);
+        };
+        auto lval = extract_val(lhs);
+        auto rval = extract_val(rhs);
         return std::make_pair(TypeSpecifier::I32Type, std::any(lval > rval));
     };
     visit_binary_op(greater_expression, call);
@@ -274,8 +314,12 @@ void InterpretingVisitor::visit(GreaterExpression* greater_expression) {
 void InterpretingVisitor::visit(LeqExpression* leq_expression) {
     auto call = [](Value lhs, Value rhs) -> Value {
         // TODO: Support more types.
-        auto lval = std::any_cast<int>(lhs.second);
-        auto rval = std::any_cast<int>(rhs.second);
+        auto extract_val = [](Value var) -> int {
+            assert(var.first == TypeSpecifier::BoolType || var.first == TypeSpecifier::I32Type);
+            return std::any_cast<int>(var.second);
+        };
+        auto lval = extract_val(lhs);
+        auto rval = extract_val(rhs);
         return std::make_pair(TypeSpecifier::I32Type, std::any(lval <= rval));
     };
     visit_binary_op(leq_expression, call);
@@ -284,8 +328,12 @@ void InterpretingVisitor::visit(LeqExpression* leq_expression) {
 void InterpretingVisitor::visit(GeqExpression* geq_expression) {
     auto call = [](Value lhs, Value rhs) -> Value {
         // TODO: Support more types.
-        auto lval = std::any_cast<int>(lhs.second);
-        auto rval = std::any_cast<int>(rhs.second);
+        auto extract_val = [](Value var) -> int {
+            assert(var.first == TypeSpecifier::BoolType || var.first == TypeSpecifier::I32Type);
+            return std::any_cast<int>(var.second);
+        };
+        auto lval = extract_val(lhs);
+        auto rval = extract_val(rhs);
         return std::make_pair(TypeSpecifier::I32Type, std::any(lval >= rval));
     };
     visit_binary_op(geq_expression, call);
@@ -294,8 +342,12 @@ void InterpretingVisitor::visit(GeqExpression* geq_expression) {
 void InterpretingVisitor::visit(ShlExpression* shl_expression) {
     auto call = [](Value lhs, Value rhs) -> Value {
         // TODO: Support more types.
-        auto lval = std::any_cast<int>(lhs.second);
-        auto rval = std::any_cast<int>(rhs.second);
+        auto extract_val = [](Value var) -> int {
+            assert(var.first == TypeSpecifier::BoolType || var.first == TypeSpecifier::I32Type);
+            return std::any_cast<int>(var.second);
+        };
+        auto lval = extract_val(lhs);
+        auto rval = extract_val(rhs);
         return std::make_pair(TypeSpecifier::I32Type, std::any(lval << rval));
     };
     visit_binary_op(shl_expression, call);
@@ -304,8 +356,12 @@ void InterpretingVisitor::visit(ShlExpression* shl_expression) {
 void InterpretingVisitor::visit(ShrExpression* shr_expression) {
     auto call = [](Value lhs, Value rhs) -> Value {
         // TODO: Support more types.
-        auto lval = std::any_cast<int>(lhs.second);
-        auto rval = std::any_cast<int>(rhs.second);
+        auto extract_val = [](Value var) -> int {
+            assert(var.first == TypeSpecifier::BoolType || var.first == TypeSpecifier::I32Type);
+            return std::any_cast<int>(var.second);
+        };
+        auto lval = extract_val(lhs);
+        auto rval = extract_val(rhs);
         return std::make_pair(TypeSpecifier::I32Type, std::any(lval >> rval));
     };
     visit_binary_op(shr_expression, call);
@@ -314,8 +370,12 @@ void InterpretingVisitor::visit(ShrExpression* shr_expression) {
 void InterpretingVisitor::visit(AddExpression* add_expression) {
     auto call = [](Value lhs, Value rhs) -> Value {
         // TODO: Support more types.
-        auto lval = std::any_cast<int>(lhs.second);
-        auto rval = std::any_cast<int>(rhs.second);
+        auto extract_val = [](Value var) -> int {
+            assert(var.first == TypeSpecifier::BoolType || var.first == TypeSpecifier::I32Type);
+            return std::any_cast<int>(var.second);
+        };
+        auto lval = extract_val(lhs);
+        auto rval = extract_val(rhs);
         return std::make_pair(TypeSpecifier::I32Type, std::any(lval + rval));
     };
     visit_binary_op(add_expression, call);
@@ -324,8 +384,12 @@ void InterpretingVisitor::visit(AddExpression* add_expression) {
 void InterpretingVisitor::visit(SubExpression* sub_expression) {
     auto call = [](Value lhs, Value rhs) -> Value {
         // TODO: Support more types.
-        auto lval = std::any_cast<int>(lhs.second);
-        auto rval = std::any_cast<int>(rhs.second);
+        auto extract_val = [](Value var) -> int {
+            assert(var.first == TypeSpecifier::BoolType || var.first == TypeSpecifier::I32Type);
+            return std::any_cast<int>(var.second);
+        };
+        auto lval = extract_val(lhs);
+        auto rval = extract_val(rhs);
         return std::make_pair(TypeSpecifier::I32Type, std::any(lval - rval));
     };
     visit_binary_op(sub_expression, call);
@@ -334,8 +398,12 @@ void InterpretingVisitor::visit(SubExpression* sub_expression) {
 void InterpretingVisitor::visit(MulExpression* mul_expression) {
     auto call = [](Value lhs, Value rhs) -> Value {
         // TODO: Support more types.
-        auto lval = std::any_cast<int>(lhs.second);
-        auto rval = std::any_cast<int>(rhs.second);
+        auto extract_val = [](Value var) -> int {
+            assert(var.first == TypeSpecifier::BoolType || var.first == TypeSpecifier::I32Type);
+            return std::any_cast<int>(var.second);
+        };
+        auto lval = extract_val(lhs);
+        auto rval = extract_val(rhs);
         return std::make_pair(TypeSpecifier::I32Type, std::any(lval * rval));
     };
     visit_binary_op(mul_expression, call);
@@ -344,8 +412,12 @@ void InterpretingVisitor::visit(MulExpression* mul_expression) {
 void InterpretingVisitor::visit(DivExpression* div_expression) {
     auto call = [](Value lhs, Value rhs) -> Value {
         // TODO: Support more types.
-        auto lval = std::any_cast<int>(lhs.second);
-        auto rval = std::any_cast<int>(rhs.second);
+        auto extract_val = [](Value var) -> int {
+            assert(var.first == TypeSpecifier::BoolType || var.first == TypeSpecifier::I32Type);
+            return std::any_cast<int>(var.second);
+        };
+        auto lval = extract_val(lhs);
+        auto rval = extract_val(rhs);
         return std::make_pair(TypeSpecifier::I32Type, std::any(lval / rval));
     };
     visit_binary_op(div_expression, call);
@@ -354,8 +426,12 @@ void InterpretingVisitor::visit(DivExpression* div_expression) {
 void InterpretingVisitor::visit(ModExpression* mod_expression) {
     auto call = [](Value lhs, Value rhs) -> Value {
         // TODO: Support more types.
-        auto lval = std::any_cast<int>(lhs.second);
-        auto rval = std::any_cast<int>(rhs.second);
+        auto extract_val = [](Value var) -> int {
+            assert(var.first == TypeSpecifier::BoolType || var.first == TypeSpecifier::I32Type);
+            return std::any_cast<int>(var.second);
+        };
+        auto lval = extract_val(lhs);
+        auto rval = extract_val(rhs);
         return std::make_pair(TypeSpecifier::I32Type, std::any(lval % rval));
     };
     visit_binary_op(mod_expression, call);
@@ -363,7 +439,53 @@ void InterpretingVisitor::visit(ModExpression* mod_expression) {
 
 
 void InterpretingVisitor::visit(FunctionCallExpression* function_call_expression) {
-    // TODO: Implement.
+    // TODO: Support function pointers.
+    auto left_expr = function_call_expression->function();
+    auto id_expr = dynamic_cast<IdentifierExpression*>(left_expr);
+
+    // Type checking for a function name.
+    if (!id_expr) {
+        // TODO: Throw error.
+        return;
+    }
+
+    std::vector<Value> args;
+    auto arg_list = function_call_expression->argument_list();
+
+    for (const auto& arg : arg_list) {
+        arg->accept_visitor(this);
+        auto arg_val = latest_values_.top();
+        args.push_back(arg_val);
+        latest_values_.pop();
+    }
+
+    auto name = id_expr->identifier();
+    auto found_func = functions_.find(name);
+
+    if (found_func == functions_.end()) {
+        // TODO: Handle this case
+        return;
+    }
+
+    // Create a new scope for each function.
+    current_scope_ = std::make_shared<Scope<Value>>(name, current_scope_);
+    auto prototype_args = found_func->second->parameter_list();
+
+    for (size_t i = 0; i < prototype_args.size(); i++) {
+        auto arg_name = prototype_args[i].second;
+        auto arg_val = args.at(i);
+        current_scope_->add_value(arg_name, arg_val);
+    }
+
+    try {
+        auto body = found_func->second->function_body();
+        body->accept_visitor(this);
+    } catch (const ReturnException& e_ret) {
+        // Return value is already at the top of the stack.
+    }
+
+    // Return to the parent scope.
+    current_scope_ = current_scope_->parent();
 }
 
 void InterpretingVisitor::visit(IdentifierExpression* identifier_expression) {
@@ -372,8 +494,7 @@ void InterpretingVisitor::visit(IdentifierExpression* identifier_expression) {
     assert(variable_opt);
     auto variable = variable_opt.value();
     // TODO: Support more types.
-    auto value = std::any_cast<int>(variable.second);
-    latest_values_.push(std::make_pair(TypeSpecifier::I32Type, std::any(value)));
+    latest_values_.push(variable);
 }
 
 void InterpretingVisitor::visit(ConstantExpression* constant_expression) {
