@@ -2,6 +2,7 @@
 #include "parser.hpp"
 
 #include "visitors/printing_visitor.hpp"
+#include "visitors/interpreting_visitor.hpp"
 #include "visitors/codegen_visitor.hpp"
 
 namespace nezoku {
@@ -59,6 +60,11 @@ void Driver::scan_end() {
 
 void Driver::print_tree(const std::string& file_name) {
     auto visitor = PrintingVisitor(file_name);
+    visitor.visit(translation_unit_);
+}
+
+void Driver::interpret(const std::string& file_name) {
+    auto visitor = InterpretingVisitor(file_name);
     visitor.visit(translation_unit_);
 }
 

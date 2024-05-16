@@ -33,8 +33,8 @@ public:
     }
 };
 
-InterpretingVisitor::InterpretingVisitor(std::ostream& stream)
-    : stream_(stream) {}
+InterpretingVisitor::InterpretingVisitor(const std::string& file_name)
+    : file_name_(file_name) {}
 
 void InterpretingVisitor::visit(TranslationUnit* translation_unit) {
     for (const auto& external_declaration: translation_unit->external_declarations()) {
@@ -49,7 +49,7 @@ void InterpretingVisitor::visit(TranslationUnit* translation_unit) {
 }
 void InterpretingVisitor::visit(FunctionDefinition* function_definition) {
     auto name = function_definition->function_name();
-    functions_->add_value(name, function_definition);
+    functions_.insert(std::make_pair(name, function_definition));
 }
 
 void InterpretingVisitor::visit(Declaration* declaration) {
@@ -363,7 +363,53 @@ void InterpretingVisitor::visit(ModExpression* mod_expression) {
 
 
 void InterpretingVisitor::visit(FunctionCallExpression* function_call_expression) {
-    // TODO: Implement.
+    // TODO: Support function pointers.
+    auto left_expr = function_call_expression->function();
+    auto id_expr = dynamic_cast<IdentifierExpression*>(left_expr);
+
+    // Type checking for a function name.
+    if (!id_expr) {
+        // TODO: Throw error.
+        return;
+    }
+
+    std::vector<Value> args;
+    auto arg_list = function_call_expression->argument_list();
+
+    for (const auto& arg : arg_list) {
+        arg->accept_visitor(this);
+        auto arg_val = latest_values_.top();
+        args.push_back(arg_val);
+        latest_values_.pop();
+    }
+
+    auto name = id_expr->identifier();
+    auto found_func = functions_.find(name);
+
+    if (found_func == functions_.end()) {
+        // TODO: Handle this case
+        return;
+    }
+
+    // Create a new scope for each function.
+    current_scope_ = std::make_shared<Scope<Value>>(name, current_scope_);
+    auto prototype_args = found_func->second->parameter_list();
+
+    for (size_t i = 0; i < prototype_args.size(); i++) {
+        auto arg_name = prototype_args[i].second;
+        auto arg_val = args.at(i);
+        current_scope_->add_value(arg_name, arg_val);
+    }
+
+    try {
+        auto body = found_func->second->function_body();
+        body->accept_visitor(this);
+    } catch (const ReturnException& e_ret) {
+        // Return value is already at the top of the stack.
+    }
+
+    // Return to the parent scope.
+    current_scope_ = current_scope_->parent();
 }
 
 void InterpretingVisitor::visit(IdentifierExpression* identifier_expression) {

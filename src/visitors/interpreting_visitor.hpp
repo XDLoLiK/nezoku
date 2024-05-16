@@ -7,6 +7,7 @@
 #include <any>
 #include <functional>
 #include <stack>
+#include <unordered_map>
 
 #include "visitor.hpp"
 #include "scope.hpp"
@@ -20,7 +21,7 @@ class InterpretingVisitor: public Visitor {
     using BinaryOp = std::function<Value (Value, Value)>;
 
 public:
-    InterpretingVisitor(std::ostream& stream);
+    InterpretingVisitor(const std::string& file_name);
     virtual ~InterpretingVisitor() = default;
 
     void visit(TranslationUnit* translation_unit) override;
@@ -64,10 +65,10 @@ private:
     void visit_binary_op(T* binary_op, BinaryOp op_func);
 
 private:
-    std::ostream& stream_;
+    std::string file_name_;
     std::stack<Value> latest_values_;
     std::shared_ptr<Scope<Value>> current_scope_;
-    std::shared_ptr<Scope<FunctionDefinition*>> functions_;
+    std::unordered_map<std::string, FunctionDefinition*> functions_;
 };
 
 }; // namespace nezoku
