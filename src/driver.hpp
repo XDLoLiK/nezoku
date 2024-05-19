@@ -2,6 +2,7 @@
 #define DRIVER_HPP
 
 #include <fstream>
+#include <filesystem>
 #include <map>
 #include <string>
 
@@ -43,7 +44,7 @@ private:
     bool trace_parsing_{false};
     bool emit_llvm_{false};
     bool ast_dump_{false};
-    std::string curr_src_file_{};
+    std::string curr_file_{};
     std::ifstream stream_{};
     yy::location location_{};
     TranslationUnit* translation_unit_{nullptr};

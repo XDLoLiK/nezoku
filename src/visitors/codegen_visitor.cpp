@@ -10,22 +10,11 @@ namespace nezoku {
 template<class... Ts> struct VariantVisitor: Ts... { using Ts::operator()...; };
 template<class... Ts> VariantVisitor(Ts...) -> VariantVisitor<Ts...>;
 
-CodegenVisitor::CodegenVisitor(const std::string& mod_name)
+CodegenVisitor::CodegenVisitor(const std::string& file_name)
     : builder_(context_)
-    , module_(std::make_unique<llvm::Module>(mod_name, context_))
+    , module_(std::make_unique<llvm::Module>(file_name, context_))
+    , file_(file_name)
     , current_scope_(std::make_shared<Scope<llvm::Value*>>("global")) {}
-
-std::error_code CodegenVisitor::write_to(const std::string& file_name) {
-    std::error_code err;
-    llvm::raw_fd_ostream out_file(file_name, err);
-
-    if (!err) {
-        module_->print(out_file, nullptr);
-        out_file.close();
-    }
-
-    return err;
-}
 
 void CodegenVisitor::visit(TranslationUnit* translation_unit) {
     for (const auto& external_declaration: translation_unit->external_declarations()) {
@@ -36,6 +25,17 @@ void CodegenVisitor::visit(TranslationUnit* translation_unit) {
             },
             external_declaration
         );
+    }
+
+    std::error_code err;
+    llvm::raw_fd_ostream out_file(file_, err);
+
+    if (!err) {
+        module_->print(out_file, nullptr);
+        out_file.close();
+    } else {
+        // TODO: Throw error.
+        return;
     }
 }
 

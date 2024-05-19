@@ -24,10 +24,8 @@ class CodegenVisitor final: public Visitor {
     using BinaryOp = std::function<llvm::Value* (llvm::Value*, llvm::Value*)>;
 
 public:
-    CodegenVisitor(const std::string& file);
+    CodegenVisitor(const std::string& file_name);
     virtual ~CodegenVisitor() = default;
-
-    std::error_code write_to(const std::string& file_name);
 
     void visit(TranslationUnit* translation_unit) override;
     void visit(FunctionDefinition* function_definition) override;
@@ -79,6 +77,7 @@ private:
     llvm::LLVMContext context_{};
     llvm::IRBuilder<> builder_;
     std::unique_ptr<llvm::Module> module_;
+    std::string file_;
     llvm::Function* current_function_{nullptr};
     llvm::BasicBlock* cond_block_{nullptr};
     llvm::BasicBlock* out_block_{nullptr};
