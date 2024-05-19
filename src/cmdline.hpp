@@ -10,7 +10,7 @@
 namespace nezoku {
 
 class CmdLineParser {
-    using ArgCallback = std::function<void (const std::string&)>;
+    using ArgCallback = std::function<void ()>;
     using DefaultCallback = std::function<bool (const std::string&)>;
 
 public:
@@ -26,7 +26,7 @@ public:
         auto [start, end] = callbacks_.equal_range(arg);
 
         for (auto curr = start; curr != end; curr++) {
-            (curr->second)(arg);
+            (curr->second)();
         }
 
         return start != end;

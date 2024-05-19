@@ -48,15 +48,17 @@ void Driver::compile(const std::vector<std::string>& sources, [[maybe_unused]] c
             return;
         }
 
+        auto path = std::filesystem::path(src_file);
+        assert(path.extension() == ".nz");
+
         if (ast_dump_) {
-            auto text_file = src_file + ".txt";
-            print_tree(text_file);
+            path.replace_extension("txt");
+            print_tree(path.string());
         }
 
-        auto ir_file = src_file + ".ll";
-        auto visitor = CodegenVisitor(ir_file);
+        path.replace_extension("ll");
+        auto visitor = CodegenVisitor(path.string());
         visitor.visit(translation_unit_);
-        visitor.write_to(ir_file);
     }
 }
 
@@ -71,8 +73,8 @@ void Driver::interpret(const std::string& file_name) {
 }
 
 int Driver::parse(const std::string& file_name) {
-    curr_src_file_ = file_name;
-    location_.initialize(&curr_src_file_);
+    curr_file_ = file_name;
+    location_.initialize(&curr_file_);
     scan_begin();
     parser_.set_debug_level(trace_parsing_);
     auto res = parser_();
@@ -81,13 +83,13 @@ int Driver::parse(const std::string& file_name) {
 }
 
 void Driver::scan_begin() {
-    if (curr_src_file_.empty()) {
+    if (curr_file_.empty()) {
         return;
     }
 
     scanner_.set_debug(trace_scanning_);
-    stream_.open(curr_src_file_);
-    std::cout << curr_src_file_ << std::endl;
+    stream_.open(curr_file_);
+    std::cout << curr_file_ << std::endl;
     scanner_.yyrestart(&stream_);
 }
 
