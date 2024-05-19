@@ -9,8 +9,7 @@ namespace nezoku {
 
 Driver::Driver()
     : scanner_(*this)
-    , parser_(*this, scanner_) {
-}
+    , parser_(*this, scanner_) {}
 
 Driver::~Driver() {
     delete translation_unit_;
@@ -49,7 +48,11 @@ void Driver::compile(const std::vector<std::string>& sources, [[maybe_unused]] c
         }
 
         auto path = std::filesystem::path(src_file);
-        assert(path.extension() == ".nz");
+
+        if (!path.has_extension() || path.extension() != ".nz") {
+            // TODO: Handle error.
+            return;
+        }
 
         if (ast_dump_) {
             path.replace_extension("txt");

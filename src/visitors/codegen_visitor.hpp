@@ -64,8 +64,8 @@ public:
     void visit(StringExpression* string_expression) override;
 
 private:
-    llvm::FunctionCallee get_printf();
-    llvm::FunctionCallee get_scanf();
+    llvm::FunctionType* printf_type();
+    llvm::FunctionType* scanf_type();
 
     template<class T>
     void visit_binary_op(T* binary_op, BinaryOp op_func);
@@ -73,17 +73,17 @@ private:
     llvm::BasicBlock* generate_block(const std::string& block_name);
 
 private:
-    std::vector<llvm::BasicBlock*> blocks_{};
+    std::string file_;
     llvm::LLVMContext context_{};
     llvm::IRBuilder<> builder_;
     std::unique_ptr<llvm::Module> module_;
-    std::string file_;
     llvm::Function* current_function_{nullptr};
     llvm::BasicBlock* cond_block_{nullptr};
     llvm::BasicBlock* out_block_{nullptr};
     std::stack<llvm::Value*> latest_values_;
     std::shared_ptr<Scope<llvm::Value*>> current_scope_;
-    std::unordered_map<std::string, llvm::Function*> functions_{};
+    std::unordered_map<std::string, llvm::FunctionType*> functions_{};
+    std::vector<llvm::BasicBlock*> blocks_{};
 };
 
 }; // namespace nezoku

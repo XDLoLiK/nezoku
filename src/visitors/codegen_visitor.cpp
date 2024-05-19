@@ -11,10 +11,14 @@ template<class... Ts> struct VariantVisitor: Ts... { using Ts::operator()...; };
 template<class... Ts> VariantVisitor(Ts...) -> VariantVisitor<Ts...>;
 
 CodegenVisitor::CodegenVisitor(const std::string& file_name)
-    : builder_(context_)
+    : file_(file_name)
+    , builder_(context_)
     , module_(std::make_unique<llvm::Module>(file_name, context_))
-    , file_(file_name)
-    , current_scope_(std::make_shared<Scope<llvm::Value*>>("global")) {}
+    , current_scope_(std::make_shared<Scope<llvm::Value*>>("global")) {
+    // Declare some standard library functions.
+    functions_.insert(std::make_pair("printf", printf_type()));
+    functions_.insert(std::make_pair("scanf", scanf_type()));
+}
 
 void CodegenVisitor::visit(TranslationUnit* translation_unit) {
     for (const auto& external_declaration: translation_unit->external_declarations()) {
@@ -30,13 +34,13 @@ void CodegenVisitor::visit(TranslationUnit* translation_unit) {
     std::error_code err;
     llvm::raw_fd_ostream out_file(file_, err);
 
-    if (!err) {
-        module_->print(out_file, nullptr);
-        out_file.close();
-    } else {
-        // TODO: Throw error.
+    if (err) {
+        std::cerr << "Error: " << err.message() << std::endl;
         return;
     }
+
+    module_->print(out_file, nullptr);
+    out_file.close();
 }
 
 void CodegenVisitor::visit(Declaration* declaration) {
@@ -76,7 +80,7 @@ void CodegenVisitor::visit(FunctionDefinition* function_definition) {
     // TODO: Support more types.
     auto func_type = llvm::FunctionType::get(builder_.getInt32Ty(), args_ref, /* isVarArg */ false);
     current_function_ = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage, func_name, module_.get());
-    functions_.insert(std::make_pair(func_name, current_function_));
+    functions_.insert(std::make_pair(func_name, func_type));
 
     // Create entry block.
     auto entry = generate_block(func_name + ".entry");
@@ -437,25 +441,14 @@ void CodegenVisitor::visit(FunctionCallExpression* function_call_expression) {
     auto name = id_expr->identifier();
     auto found_func = functions_.find(name);
 
-    // TODO: Clean the code here.
-    if (found_func == functions_.end()) {
-        if (name == "printf") {
-            auto func_callee = get_printf();
-            auto ret_value = builder_.CreateCall(func_callee, args_ref);
-            latest_values_.push(ret_value);
-        } else if (name == "scanf") {
-            auto func_callee = get_scanf();
-            auto ret_value = builder_.CreateCall(func_callee, args_ref);
-            latest_values_.push(ret_value);
-        } else {
-            // TODO: Throw error.
-            return;
-        }
-    } else {
-        auto func_type = found_func->second->getFunctionType();
+    if (found_func != functions_.end()) {
+        auto func_type = found_func->second;
         auto func_callee = module_->getOrInsertFunction(name, func_type);
         auto ret_value = builder_.CreateCall(func_callee, args_ref);
         latest_values_.push(ret_value);
+    } else {
+        // TODO: Throw error.
+        return;
     }
 }
 
@@ -487,22 +480,20 @@ void CodegenVisitor::visit(StringExpression* string_expression) {
     latest_values_.push(value);
 }
 
-llvm::FunctionCallee CodegenVisitor::get_printf() {
+llvm::FunctionType* CodegenVisitor::printf_type() {
     auto printf_ret = builder_.getInt32Ty();
     std::vector<llvm::Type*> printf_args;
     printf_args.push_back(builder_.getInt8Ty()->getPointerTo());
     llvm::ArrayRef<llvm::Type*> args_ref(printf_args);
-    auto printf_type = llvm::FunctionType::get(printf_ret, args_ref, /* IsVarArg */ true);
-    return module_->getOrInsertFunction("printf", printf_type);
+    return llvm::FunctionType::get(printf_ret, args_ref, /* IsVarArg */ true);
 }
 
-llvm::FunctionCallee CodegenVisitor::get_scanf() {
+llvm::FunctionType* CodegenVisitor::scanf_type() {
     auto scanf_ret = builder_.getInt32Ty();
     std::vector<llvm::Type*> scanf_args;
     scanf_args.push_back(builder_.getInt8Ty()->getPointerTo());
     llvm::ArrayRef<llvm::Type*> args_ref(scanf_args);
-    auto scanf_type = llvm::FunctionType::get(scanf_ret, args_ref, /* IsVarArg */ true);
-    return module_->getOrInsertFunction("scanf", scanf_type);
+    return llvm::FunctionType::get(scanf_ret, args_ref, /* IsVarArg */ true);
 }
 
 template<class T>
