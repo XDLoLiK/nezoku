@@ -62,7 +62,7 @@ void InterpretingVisitor::visit(Declaration* declaration) {
         init_val = latest_values_.top();
         latest_values_.pop();
     }
-    
+
     auto name = declaration->variable_name();
     current_scope_->add_value(name, init_val);
 }

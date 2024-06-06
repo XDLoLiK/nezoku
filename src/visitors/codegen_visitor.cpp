@@ -88,7 +88,8 @@ void CodegenVisitor::visit(FunctionDefinition* function_definition) {
         auto arg = current_function_->getArg(i);
         auto new_var = builder_.CreateAlloca(arg->getType());
         builder_.CreateStore(arg, new_var);
-        current_scope_->add_value(args[i].second, new_var);
+        auto var_name = args[i].second;
+        current_scope_->add_value(var_name, new_var);
     }
 
     auto body = function_definition->function_body();
@@ -254,18 +255,86 @@ void CodegenVisitor::visit(AssignmentExpression* assignment_expression) {
         return;
     }
 
+    // Compile right expression.
     auto right_expr = assignment_expression->right_expression();
     right_expr->accept_visitor(this);
     auto value = latest_values_.top();
     latest_values_.pop();
 
+    // Compile assignment.
     auto variable = variable_opt.value();
+    auto operation = assignment_expression->op();
+
+    switch (operation) {
+        case AssignmentOperator::Assign: break;
+        case AssignmentOperator::AddAssign: {
+            auto cur_val = builder_.CreateLoad(builder_.getInt32Ty(), variable);
+            auto new_val = builder_.CreateAdd(cur_val, value);
+            value = new_val;
+            break;
+        }
+        case AssignmentOperator::SubAssign: {
+            auto cur_val = builder_.CreateLoad(builder_.getInt32Ty(), variable);
+            auto new_val = builder_.CreateSub(cur_val, value);
+            value = new_val;
+            break;
+        }
+        case AssignmentOperator::MulAssign: {
+            auto cur_val = builder_.CreateLoad(builder_.getInt32Ty(), variable);
+            auto new_val = builder_.CreateMul(cur_val, value);
+            value = new_val;
+            break;
+        }
+        case AssignmentOperator::DivAssign: {
+            auto cur_val = builder_.CreateLoad(builder_.getInt32Ty(), variable);
+            auto new_val = builder_.CreateSDiv(cur_val, value);
+            value = new_val;
+            break;
+        }
+        case AssignmentOperator::ModAssign: {
+            auto cur_val = builder_.CreateLoad(builder_.getInt32Ty(), variable);
+            auto new_val = builder_.CreateSRem(cur_val, value);
+            value = new_val;
+            break;
+        }
+        case AssignmentOperator::AndAssign: {
+            auto cur_val = builder_.CreateLoad(builder_.getInt32Ty(), variable);
+            auto new_val = builder_.CreateAnd(cur_val, value);
+            value = new_val;
+            break;
+        }
+        case AssignmentOperator::OrAssign: {
+            auto cur_val = builder_.CreateLoad(builder_.getInt32Ty(), variable);
+            auto new_val = builder_.CreateOr(cur_val, value);
+            value = new_val;
+            break;
+        }
+        case AssignmentOperator::XorAssign: {
+            auto cur_val = builder_.CreateLoad(builder_.getInt32Ty(), variable);
+            auto new_val = builder_.CreateXor(cur_val, value);
+            value = new_val;
+            break;
+        }
+        case AssignmentOperator::ShlAssign: {
+            auto cur_val = builder_.CreateLoad(builder_.getInt32Ty(), variable);
+            auto new_val = builder_.CreateShl(cur_val, value);
+            value = new_val;
+            break;
+        }
+        case AssignmentOperator::ShrAssign: {
+            auto cur_val = builder_.CreateLoad(builder_.getInt32Ty(), variable);
+            auto new_val = builder_.CreateLShr(cur_val, value);
+            value = new_val;
+            break;
+        }
+        default: {
+            // TODO: Throw error.
+            return;
+        }
+    }
+
     // TODO: Support different assignment operations.
     builder_.CreateStore(value, variable);
-    // TODO: Support more types.
-    auto new_value = builder_.CreateLoad(builder_.getInt32Ty(), variable);
-    // TODO: Detect and discard (pop) unused expressions.
-    latest_values_.push(new_value);
 }
 
 void CodegenVisitor::visit(LorExpression* logical_or_expression) {

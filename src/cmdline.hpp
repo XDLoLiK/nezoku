@@ -26,7 +26,8 @@ public:
         auto [start, end] = callbacks_.equal_range(arg);
 
         for (auto curr = start; curr != end; curr++) {
-            (curr->second)();
+            auto callback = curr->second;
+            (callback)();
         }
 
         return start != end;
