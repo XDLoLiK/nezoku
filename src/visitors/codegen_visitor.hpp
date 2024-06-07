@@ -22,6 +22,7 @@ namespace nezoku {
 
 class CodegenVisitor final: public Visitor {
     using BinaryOp = std::function<llvm::Value* (llvm::Value*, llvm::Value*)>;
+    using Variable = std::pair<llvm::Type*, llvm::Value*>;
 
 public:
     CodegenVisitor(const std::string& file_name);
@@ -72,6 +73,9 @@ private:
 
     llvm::BasicBlock* generate_block(const std::string& block_name);
 
+    llvm::Type* type_to_llvm_type(TypeSpecifier type);
+    bool type_is_signed(TypeSpecifier type);
+
 private:
     std::string file_;
     llvm::LLVMContext context_{};
@@ -81,7 +85,7 @@ private:
     llvm::BasicBlock* cond_block_{nullptr};
     llvm::BasicBlock* out_block_{nullptr};
     std::stack<llvm::Value*> latest_values_;
-    std::shared_ptr<Scope<llvm::Value*>> current_scope_;
+    std::shared_ptr<Scope<Variable>> current_scope_;
     std::unordered_map<std::string, llvm::FunctionType*> functions_{};
     std::vector<llvm::BasicBlock*> blocks_{};
 };

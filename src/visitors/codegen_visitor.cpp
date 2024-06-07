@@ -14,7 +14,7 @@ CodegenVisitor::CodegenVisitor(const std::string& file_name)
     : file_(file_name)
     , builder_(context_)
     , module_(std::make_unique<llvm::Module>(file_name, context_))
-    , current_scope_(std::make_shared<Scope<llvm::Value*>>("global")) {
+    , current_scope_(std::make_shared<Scope<Variable>>("global")) {
     // Declare some standard library functions.
     functions_.insert(std::make_pair("printf", printf_type()));
     functions_.insert(std::make_pair("scanf", scanf_type()));
@@ -45,7 +45,8 @@ void CodegenVisitor::visit(TranslationUnit* translation_unit) {
 
 void CodegenVisitor::visit(Declaration* declaration) {
     // TODO: Support more types.
-    auto new_var = builder_.CreateAlloca(builder_.getInt32Ty());
+    auto type = builder_.getInt32Ty();
+    auto new_var = builder_.CreateAlloca(type);
 
     // Compile initial value.
     auto init = declaration->initializer();
@@ -58,13 +59,13 @@ void CodegenVisitor::visit(Declaration* declaration) {
     }
 
     auto name = declaration->variable_name();
-    current_scope_->add_value(name, new_var);
+    current_scope_->add_value(name, std::make_pair(type, new_var));
 }
 
 void CodegenVisitor::visit(FunctionDefinition* function_definition) {
     // Create a new scope for each function.
     auto func_name = function_definition->function_name();
-    current_scope_ = std::make_shared<Scope<llvm::Value*>>(func_name, current_scope_);
+    current_scope_ = std::make_shared<Scope<Variable>>(func_name, current_scope_);
 
     std::vector<llvm::Type*> arg_types;
     auto args = function_definition->parameter_list();
@@ -86,10 +87,11 @@ void CodegenVisitor::visit(FunctionDefinition* function_definition) {
 
     for (size_t i = 0; i < args.size(); i++) {
         auto arg = current_function_->getArg(i);
-        auto new_var = builder_.CreateAlloca(arg->getType());
+        auto type = arg->getType();
+        auto new_var = builder_.CreateAlloca(type);
         builder_.CreateStore(arg, new_var);
         auto var_name = args[i].second;
-        current_scope_->add_value(var_name, new_var);
+        current_scope_->add_value(var_name, std::make_pair(type, new_var));
     }
 
     auto body = function_definition->function_body();
@@ -101,7 +103,7 @@ void CodegenVisitor::visit(FunctionDefinition* function_definition) {
 
 void CodegenVisitor::visit(CompoundStatement* compound_statement) {
     // Create a new anonymous scope.
-    current_scope_ = std::make_shared<Scope<llvm::Value*>>(current_scope_);
+    current_scope_ = std::make_shared<Scope<Variable>>(current_scope_);
 
     for (const auto& block_item: compound_statement->block_item_list()) {
         std::visit(
@@ -262,73 +264,75 @@ void CodegenVisitor::visit(AssignmentExpression* assignment_expression) {
     latest_values_.pop();
 
     // Compile assignment.
-    auto variable = variable_opt.value();
+    auto type = variable_opt.value().first;
+    auto variable = variable_opt.value().second;
     auto operation = assignment_expression->op();
 
     switch (operation) {
         case AssignmentOperator::Assign: break;
         case AssignmentOperator::AddAssign: {
-            auto cur_val = builder_.CreateLoad(builder_.getInt32Ty(), variable);
+            auto cur_val = builder_.CreateLoad(type, variable);
             auto new_val = builder_.CreateAdd(cur_val, value);
             value = new_val;
             break;
         }
         case AssignmentOperator::SubAssign: {
-            auto cur_val = builder_.CreateLoad(builder_.getInt32Ty(), variable);
+            auto cur_val = builder_.CreateLoad(type, variable);
             auto new_val = builder_.CreateSub(cur_val, value);
             value = new_val;
             break;
         }
         case AssignmentOperator::MulAssign: {
-            auto cur_val = builder_.CreateLoad(builder_.getInt32Ty(), variable);
+            auto cur_val = builder_.CreateLoad(type, variable);
             auto new_val = builder_.CreateMul(cur_val, value);
             value = new_val;
             break;
         }
         case AssignmentOperator::DivAssign: {
-            auto cur_val = builder_.CreateLoad(builder_.getInt32Ty(), variable);
+            auto cur_val = builder_.CreateLoad(type, variable);
             auto new_val = builder_.CreateSDiv(cur_val, value);
             value = new_val;
             break;
         }
         case AssignmentOperator::ModAssign: {
-            auto cur_val = builder_.CreateLoad(builder_.getInt32Ty(), variable);
+            auto cur_val = builder_.CreateLoad(type, variable);
             auto new_val = builder_.CreateSRem(cur_val, value);
             value = new_val;
             break;
         }
         case AssignmentOperator::AndAssign: {
-            auto cur_val = builder_.CreateLoad(builder_.getInt32Ty(), variable);
+            auto cur_val = builder_.CreateLoad(type, variable);
             auto new_val = builder_.CreateAnd(cur_val, value);
             value = new_val;
             break;
         }
         case AssignmentOperator::OrAssign: {
-            auto cur_val = builder_.CreateLoad(builder_.getInt32Ty(), variable);
+            auto cur_val = builder_.CreateLoad(type, variable);
             auto new_val = builder_.CreateOr(cur_val, value);
             value = new_val;
             break;
         }
         case AssignmentOperator::XorAssign: {
-            auto cur_val = builder_.CreateLoad(builder_.getInt32Ty(), variable);
+            auto cur_val = builder_.CreateLoad(type, variable);
             auto new_val = builder_.CreateXor(cur_val, value);
             value = new_val;
             break;
         }
         case AssignmentOperator::ShlAssign: {
-            auto cur_val = builder_.CreateLoad(builder_.getInt32Ty(), variable);
+            auto cur_val = builder_.CreateLoad(type, variable);
             auto new_val = builder_.CreateShl(cur_val, value);
             value = new_val;
             break;
         }
         case AssignmentOperator::ShrAssign: {
-            auto cur_val = builder_.CreateLoad(builder_.getInt32Ty(), variable);
+            auto cur_val = builder_.CreateLoad(type, variable);
             auto new_val = builder_.CreateLShr(cur_val, value);
             value = new_val;
             break;
         }
         default: {
             // TODO: Throw error.
+            std::cerr << "Unsupported assign operator " << static_cast<int>(operation) << std::endl;
             return;
         }
     }
@@ -500,12 +504,13 @@ void CodegenVisitor::visit(FunctionCallExpression* function_call_expression) {
 
 void CodegenVisitor::visit(IdentifierExpression* identifier_expression) {
     auto name = identifier_expression->identifier();
-    auto value_opt = scope_find_value(name, current_scope_);
-    assert(value_opt);
-    auto value = value_opt.value();
+    auto variable_opt = scope_find_value(name, current_scope_);
+    assert(variable_opt);
+    auto type = variable_opt.value().first;
+    auto variable = variable_opt.value().second;
     // TODO: Support more types.
-    auto load = builder_.CreateLoad(builder_.getInt32Ty(), value);
-    latest_values_.push(load);
+    auto value = builder_.CreateLoad(type, variable);
+    latest_values_.push(value);
 }
 
 void CodegenVisitor::visit(ConstantExpression* constant_expression) {
@@ -562,6 +567,49 @@ llvm::BasicBlock* CodegenVisitor::generate_block(const std::string& block_name) 
     auto new_bb = llvm::BasicBlock::Create(context_, block_name + id, current_function_);
     blocks_.push_back(new_bb);
     return new_bb;
+}
+
+[[maybe_unused]]
+llvm::Type* CodegenVisitor::type_to_llvm_type(TypeSpecifier type) {
+    switch (type) {
+        case TypeSpecifier::VoidType: return builder_.getVoidTy();
+        case TypeSpecifier::I8Type: [[fallthrough]];
+        case TypeSpecifier::U8Type: return builder_.getInt8Ty();
+        case TypeSpecifier::CharType: return builder_.getInt8Ty();
+        case TypeSpecifier::I16Type: [[fallthrough]];
+        case TypeSpecifier::U16Type: return builder_.getInt16Ty();
+        case TypeSpecifier::I32Type: [[fallthrough]];
+        case TypeSpecifier::U32Type: return builder_.getInt32Ty();
+        case TypeSpecifier::I64Type: [[fallthrough]];
+        case TypeSpecifier::U64Type: return builder_.getInt64Ty();
+        case TypeSpecifier::BoolType: return builder_.getInt1Ty();
+        case TypeSpecifier::F32Type: return builder_.getFloatTy();
+        case TypeSpecifier::F64Type: return builder_.getDoubleTy();
+        default: {
+            // TODO: Throw error.
+            std::cerr << "Unsupported type " << static_cast<int>(type) << std::endl;
+            return nullptr;
+        }
+    }
+}
+
+[[maybe_unused]]
+bool CodegenVisitor::type_is_signed(TypeSpecifier type) {
+    switch (type) {
+        case TypeSpecifier::I8Type: [[fallthrough]];
+        case TypeSpecifier::I16Type: [[fallthrough]];
+        case TypeSpecifier::I32Type: [[fallthrough]];
+        case TypeSpecifier::I64Type: return true;
+        case TypeSpecifier::U8Type: [[fallthrough]];
+        case TypeSpecifier::U16Type: [[fallthrough]];
+        case TypeSpecifier::U32Type: [[fallthrough]];
+        case TypeSpecifier::U64Type: return false;
+        default: {
+            // TODO: Throw error.
+            std::cerr << "Signed qualifier cannot be applied to type " << static_cast<int>(type) << std::endl;
+            return false;
+        }
+    }
 }
 
 }; // namespace nezoku
