@@ -14,7 +14,7 @@ CodegenVisitor::CodegenVisitor(const std::string& file_name)
     : file_(file_name)
     , builder_(context_)
     , module_(std::make_unique<llvm::Module>(file_name, context_))
-    , current_scope_(std::make_shared<Scope<Variable>>("global")) {
+    , current_scope_(std::make_shared<Scope<Value>>("global")) {
     // Declare some standard library functions.
     functions_.insert(std::make_pair("printf", printf_type()));
     functions_.insert(std::make_pair("scanf", scanf_type()));
@@ -45,7 +45,9 @@ void CodegenVisitor::visit(TranslationUnit* translation_unit) {
 
 void CodegenVisitor::visit(Declaration* declaration) {
     // TODO: Support more types.
-    auto type = builder_.getInt32Ty();
+    auto nezoku_type = declaration->variable_type();
+    auto type = type_to_llvm_type(nezoku_type);
+    auto is_signed = type_is_signed(nezoku_type);
     auto new_var = builder_.CreateAlloca(type);
 
     // Compile initial value.
@@ -59,21 +61,23 @@ void CodegenVisitor::visit(Declaration* declaration) {
     }
 
     auto name = declaration->variable_name();
-    current_scope_->add_value(name, std::make_pair(type, new_var));
+    current_scope_->add_value(name, Value(type, new_var, is_signed));
 }
 
 void CodegenVisitor::visit(FunctionDefinition* function_definition) {
     // Create a new scope for each function.
     auto func_name = function_definition->function_name();
-    current_scope_ = std::make_shared<Scope<Variable>>(func_name, current_scope_);
+    current_scope_ = std::make_shared<Scope<Value>>(func_name, current_scope_);
 
     std::vector<llvm::Type*> arg_types;
     auto args = function_definition->parameter_list();
 
-    for ([[maybe_unused]] const auto& arg: args) {
-        auto var_type = type_to_llvm_type(arg.first);
+    for (const auto& arg: args) {
+        auto nezoku_type = arg.first;
+        auto var_type = type_to_llvm_type(nezoku_type);
+        [[maybe_unused]] auto var_signed = type_is_signed(nezoku_type);
         assert(var_type);
-        arg_types.push_back(builder_.getInt32Ty());
+        arg_types.push_back(var_type);
     }
 
     llvm::ArrayRef<llvm::Type*> args_ref(arg_types);
@@ -94,7 +98,7 @@ void CodegenVisitor::visit(FunctionDefinition* function_definition) {
         auto new_var = builder_.CreateAlloca(type);
         builder_.CreateStore(arg, new_var);
         auto var_name = args[i].second;
-        current_scope_->add_value(var_name, std::make_pair(type, new_var));
+        current_scope_->add_value(var_name, Value(type, new_var));
     }
 
     auto body = function_definition->function_body();
@@ -106,7 +110,7 @@ void CodegenVisitor::visit(FunctionDefinition* function_definition) {
 
 void CodegenVisitor::visit(CompoundStatement* compound_statement) {
     // Create a new anonymous scope.
-    current_scope_ = std::make_shared<Scope<Variable>>(current_scope_);
+    current_scope_ = std::make_shared<Scope<Value>>(current_scope_);
 
     for (const auto& block_item: compound_statement->block_item_list()) {
         std::visit(
@@ -267,8 +271,8 @@ void CodegenVisitor::visit(AssignmentExpression* assignment_expression) {
     latest_values_.pop();
 
     // Compile assignment.
-    auto type = variable_opt.value().first;
-    auto variable = variable_opt.value().second;
+    auto type = variable_opt.value().type;
+    auto variable = variable_opt.value().value;
     auto operation = assignment_expression->op();
 
     switch (operation) {
@@ -509,8 +513,8 @@ void CodegenVisitor::visit(IdentifierExpression* identifier_expression) {
     auto name = identifier_expression->identifier();
     auto variable_opt = scope_find_value(name, current_scope_);
     assert(variable_opt);
-    auto type = variable_opt.value().first;
-    auto variable = variable_opt.value().second;
+    auto type = variable_opt.value().type;
+    auto variable = variable_opt.value().value;
     // TODO: Support more types.
     auto value = builder_.CreateLoad(type, variable);
     latest_values_.push(value);
