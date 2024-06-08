@@ -404,7 +404,7 @@ void InterpretingVisitor::visit(FunctionCallExpression* function_call_expression
     try {
         auto body = found_func->second->function_body();
         body->accept_visitor(this);
-    } catch (const ReturnException& e_ret) {
+    } catch (const ReturnException& ret_e) {
         // Return value is already at the top of the stack.
     }
 

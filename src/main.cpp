@@ -6,12 +6,12 @@
 
 int main(int argc, const char** argv) {
     nezoku::Driver driver;
-    nezoku::CmdLineParser parser;
+    nezoku::CmdLineParser arg_parser;
     std::vector<std::string> sources;
     std::string output = "a.ll";
     bool next_output = false;
 
-    parser.add_default([&](const std::string& file_name) -> bool {
+    arg_parser.add_default([&](const std::string& file_name) -> bool {
         if (next_output) {
             next_output = false;
             output = file_name;
@@ -23,11 +23,11 @@ int main(int argc, const char** argv) {
         }
     });
 
-    parser.add_callback("--trace-parsing", [&]() { driver.trace_parsing(true); });
-    parser.add_callback("--trace-scanning", [&]() { driver.trace_scanning(true); });
-    parser.add_callback("--emit-llvm", [&]() { driver.emit_llvm(true); });
-    parser.add_callback("--ast-dump", [&]() { driver.ast_dump(true); });
-    parser.add_callback("-o", [&]() { next_output = true; });
+    arg_parser.add_callback("--trace-parsing", [&]() { driver.trace_parsing(true); });
+    arg_parser.add_callback("--trace-scanning", [&]() { driver.trace_scanning(true); });
+    arg_parser.add_callback("--emit-llvm", [&]() { driver.emit_llvm(true); });
+    arg_parser.add_callback("--ast-dump", [&]() { driver.ast_dump(true); });
+    arg_parser.add_callback("-o", [&]() { next_output = true; });
 
     std::vector<std::string> args;
 
@@ -36,7 +36,7 @@ int main(int argc, const char** argv) {
         args.push_back(arg);
     }
 
-    parser.parse_args(args);
+    arg_parser.parse_args(args);
     driver.compile(sources, output);
     return 0;
 }

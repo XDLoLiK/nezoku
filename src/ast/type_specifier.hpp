@@ -6,7 +6,7 @@
 namespace nezoku {
 
 enum class TypeSpecifier {
-    VoidType = 0,
+    UnitType = 0,
     I8Type = 1,
     I16Type = 2,
     I32Type = 3,

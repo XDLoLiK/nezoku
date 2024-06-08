@@ -47,7 +47,7 @@ template<class... Ts> VariantVisitor(Ts...) -> VariantVisitor<Ts...>;
 
 static std::string type_specifier_str(const TypeSpecifier& type) {
     switch (type) {
-        case TypeSpecifier::VoidType: return "void";
+        case TypeSpecifier::UnitType: return "void";
         case TypeSpecifier::I8Type: return "i8";
         case TypeSpecifier::I16Type: return "i16";
         case TypeSpecifier::I32Type: return "i32";

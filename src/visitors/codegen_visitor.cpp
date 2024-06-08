@@ -71,14 +71,17 @@ void CodegenVisitor::visit(FunctionDefinition* function_definition) {
     auto args = function_definition->parameter_list();
 
     for ([[maybe_unused]] const auto& arg: args) {
-        // TODO: Support more types.
+        auto var_type = type_to_llvm_type(arg.first);
+        assert(var_type);
         arg_types.push_back(builder_.getInt32Ty());
     }
 
     llvm::ArrayRef<llvm::Type*> args_ref(arg_types);
-    // TODO: Support more types.
-    auto func_type = llvm::FunctionType::get(builder_.getInt32Ty(), args_ref, /* isVarArg */ false);
-    current_function_ = llvm::Function::Create(func_type, llvm::Function::ExternalLinkage, func_name, module_.get());
+    auto ret_type = type_to_llvm_type(function_definition->return_type());
+    assert(ret_type);
+    auto func_type = llvm::FunctionType::get(ret_type, args_ref, /* isVarArg */ false);
+    current_function_ =
+        llvm::Function::Create(func_type, llvm::Function::ExternalLinkage, func_name, module_.get());
     functions_.insert(std::make_pair(func_name, func_type));
 
     // Create entry block.
@@ -572,7 +575,7 @@ llvm::BasicBlock* CodegenVisitor::generate_block(const std::string& block_name) 
 [[maybe_unused]]
 llvm::Type* CodegenVisitor::type_to_llvm_type(TypeSpecifier type) {
     switch (type) {
-        case TypeSpecifier::VoidType: return builder_.getVoidTy();
+        case TypeSpecifier::UnitType: return builder_.getVoidTy();
         case TypeSpecifier::I8Type: [[fallthrough]];
         case TypeSpecifier::U8Type: return builder_.getInt8Ty();
         case TypeSpecifier::CharType: return builder_.getInt8Ty();
